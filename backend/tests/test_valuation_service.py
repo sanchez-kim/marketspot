@@ -21,6 +21,10 @@ def test_week52_position_none_when_degenerate() -> None:
     assert week52_position(100.0, 100.0, 100.0) is None  # high==low
 
 
+def test_week52_position_none_when_inverted_band() -> None:
+    assert week52_position(100.0, 200.0, 100.0) is None  # high<low → None
+
+
 class _FundProv:
     name = "fake-fund"
 
@@ -92,6 +96,7 @@ async def test_valuation_combines_fundamentals_and_overheating() -> None:
     assert val.note is not None
     assert val.week52_position_pct == 90.0  # (250-160)/(260-160)*100
     assert val.vs_ma200_pct is not None and val.vs_ma200_pct > 0
+    assert val.pe_vs_5y_avg_pct is None  # yfinance 한계 — 정직하게 비움
 
 
 async def test_valuation_propagates_no_data() -> None:

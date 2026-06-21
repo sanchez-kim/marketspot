@@ -60,12 +60,14 @@ class ValuationService:
         vs_ma200: float | None = None
         position: float | None = None
 
+        as_of = None
         env = await self._registry.get_bars(symbol, _PERIOD, _INTERVAL)
         if env.data is not None and env.status in _HAS_DATA and env.data:
             closes = [b.close for b in env.data]
             price = closes[-1]
+            as_of = env.as_of
             ma200 = _sma(closes, 200)
-            if ma200:
+            if ma200 is not None:
                 vs_ma200 = round((price / ma200 - 1) * 100, 1)
             if fund.week52_low is not None and fund.week52_high is not None:
                 position = week52_position(price, fund.week52_low, fund.week52_high)
@@ -73,8 +75,10 @@ class ValuationService:
         return ValuationContext(
             symbol=symbol.upper(),
             status=fund.status,
+            as_of=as_of,
             pe_ratio=fund.pe_ratio,
             pe_5y_avg=None,
+            pe_vs_5y_avg_pct=None,
             dividend_yield=fund.dividend_yield,
             week52_high=fund.week52_high,
             week52_low=fund.week52_low,
