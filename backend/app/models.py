@@ -253,6 +253,44 @@ class PortfolioSummary(CamelModel):
     as_of: datetime | None = None
 
 
+# ---- 포트폴리오 리스크(근거 ④) ----------------------------------------------
+
+
+class HoldingWeight(CamelModel):
+    """보유 비중 한 건(평가액 기준 %)."""
+
+    symbol: str
+    weight: float
+
+
+class CorrelationPair(CamelModel):
+    """두 종목의 상관계수(-1~1). 같이 움직일수록 분산 효과가 적다."""
+
+    a: str
+    b: str
+    corr: float
+
+
+class PortfolioRisk(CamelModel):
+    """포트폴리오 집중도·상관(분산) 요약. 근거 ④ '포트폴리오 영향'.
+
+    예측이 아니라 현재 보유의 *구조적 사실*만 담는다. 시세/이력이 없는 종목은
+    excluded 로 빼고 그 사실을 표기한다(가짜 ❌).
+    """
+
+    status: DataStatus
+    as_of: datetime | None = None
+    concentration_hhi: float | None = None  # 0~1 (1=완전 집중)
+    top_symbol: str | None = None
+    top_weight: float | None = None  # %
+    weights: list[HoldingWeight] = []
+    correlations: list[CorrelationPair] = []
+    avg_correlation: float | None = None  # 평균 쌍별 상관(낮을수록 분산↑)
+    lookback_days: int | None = None
+    excluded: list[str] = []  # 시세/이력 없어 상관 계산 제외
+    message: str | None = None
+
+
 # ---- 심볼 검색 (자동완성) ----------------------------------------------------
 
 

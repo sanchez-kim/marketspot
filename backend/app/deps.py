@@ -29,6 +29,7 @@ from .services.news import NewsAIService
 from .services.portfolio import PortfolioService
 from .services.quotes import QuoteService
 from .services.reassurance import ReassuranceService
+from .services.risk import RiskService
 from .services.spark import SparkService
 
 
@@ -68,6 +69,11 @@ def get_news_service() -> NewsAIService:
 @lru_cache(maxsize=1)
 def get_portfolio_service() -> PortfolioService:
     return PortfolioService(get_quote_service())
+
+
+@lru_cache(maxsize=1)
+def get_risk_service() -> RiskService:
+    return RiskService(get_registry(), get_portfolio_service())
 
 
 @lru_cache(maxsize=1)

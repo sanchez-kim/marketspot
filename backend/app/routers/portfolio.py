@@ -11,10 +11,11 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from ..deps import get_portfolio_service
-from ..models import PortfolioSummary, Position
+from ..deps import get_portfolio_service, get_risk_service
+from ..models import PortfolioRisk, PortfolioSummary, Position
 from ..portfolio_store import save_positions
 from ..services.portfolio import PortfolioService
+from ..services.risk import RiskService
 
 router = APIRouter(prefix="/api/portfolio", tags=["portfolio"])
 
@@ -33,3 +34,10 @@ async def replace_portfolio(
 ) -> PortfolioSummary:
     save_positions(positions)
     return await service.value(positions)
+
+
+@router.get("/risk")
+async def get_portfolio_risk(
+    service: Annotated[RiskService, Depends(get_risk_service)],
+) -> PortfolioRisk:
+    return await service.get_risk()
