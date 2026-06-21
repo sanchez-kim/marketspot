@@ -27,6 +27,34 @@ function renderHome() {
   );
 }
 
+function renderHomeWithDirtyLayout() {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  qc.setQueryData(["settings"], {
+    watchlist: ["VOO"],
+    defaultSymbol: "VOO",
+    dashboard: {
+      left: ["plan", "portfolio", "watchlist"],
+      right: ["mood", "news", "events", "learn"],
+      hidden: [],
+    },
+  });
+  qc.setQueryData(["portfolio"], {
+    positions: [],
+    totalValue: 0,
+    totalCost: 0,
+    totalPnl: 0,
+    totalPnlPct: null,
+    valuedCount: 0,
+    unvaluedCount: 0,
+    asOf: null,
+  });
+  return render(
+    <QueryClientProvider client={qc}>
+      <HomeTab />
+    </QueryClientProvider>,
+  );
+}
+
 describe("HomeTab cockpit (verdict removed)", () => {
   it("does NOT render a verdict headline/todo banner", () => {
     renderHome();
@@ -34,6 +62,17 @@ describe("HomeTab cockpit (verdict removed)", () => {
   });
   it("does NOT render the 투자원칙 card", () => {
     renderHome();
+    expect(screen.queryByText("투자원칙")).not.toBeInTheDocument();
+  });
+});
+
+describe("HomeTab cockpit layout reconcile", () => {
+  it("drops legacy 'plan' id from saved dashboard without crashing", () => {
+    // Regression: Task 6 removed the 'plan' card from the registry.
+    // A saved settings.json with 'plan' in dashboard.left must be silently
+    // dropped by reconcile() — unknown ids are filtered out, not thrown on.
+    expect(() => renderHomeWithDirtyLayout()).not.toThrow();
+    // The legacy plan card must NOT appear in the rendered cockpit.
     expect(screen.queryByText("투자원칙")).not.toBeInTheDocument();
   });
 });
