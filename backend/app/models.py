@@ -327,6 +327,32 @@ class MacroConditions(CamelModel):
     as_of: datetime | None = None
 
 
+# ---- 밸류 컨텍스트(근거 ①) --------------------------------------------------
+
+
+class ValuationContext(CamelModel):
+    """근거 ① '밸류·과열도'. 사실만 — 싸다/비싸다 판단은 사용자.
+
+    5년 평균 PER 은 yfinance 한계로 신뢰 제공이 어려워 null 로 두고 note 로
+    그 사실을 알린다(가짜 ❌).
+    """
+
+    symbol: str
+    status: DataStatus
+    as_of: datetime | None = None
+    pe_ratio: float | None = None
+    pe_5y_avg: float | None = None  # 미제공(yfinance 한계) → null
+    pe_vs_5y_avg_pct: float | None = None
+    dividend_yield: float | None = None  # %
+    week52_high: float | None = None
+    week52_low: float | None = None
+    week52_position_pct: float | None = None  # 0=저점,100=고점
+    price: float | None = None
+    vs_ma200_pct: float | None = None  # 200일선 대비(과열도 단서)
+    note: str | None = None
+    message: str | None = None
+
+
 # ---- 심볼 검색 (자동완성) ----------------------------------------------------
 
 

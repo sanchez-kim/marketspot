@@ -34,6 +34,7 @@ from .services.quotes import QuoteService
 from .services.reassurance import ReassuranceService
 from .services.risk import RiskService
 from .services.spark import SparkService
+from .services.valuation import ValuationService
 
 
 def build_registry() -> ProviderRegistry:
@@ -133,3 +134,8 @@ def _fred_key() -> str:
 def get_conditions_service() -> MacroConditionsService:
     fred = FredMacroProvider(_fred_key())
     return MacroConditionsService(fred, get_registry())
+
+
+@lru_cache(maxsize=1)
+def get_valuation_service() -> ValuationService:
+    return ValuationService(get_fundamentals_provider(), get_registry())
