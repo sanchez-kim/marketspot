@@ -8,8 +8,8 @@ const base: ValuationContext = {
   status: "DELAYED",
   asOf: "2026-06-18T00:00:00-04:00",
   peRatio: 36.12,
-  pe5yAvg: null,
-  peVs5yAvgPct: null,
+  pe5YAvg: null,
+  peVs5YAvgPct: null,
   dividendYield: 0.36,
   week52High: 317.4,
   week52Low: 198.96,
@@ -31,7 +31,7 @@ describe("ValuationPanel", () => {
   it("shows honest note that 5y PER is unavailable (no fabricated value)", () => {
     render(<ValuationPanel data={base} />);
     expect(screen.getByText(/5년 평균 PER/)).toBeInTheDocument();
-    // pe5yAvg null → must NOT render a number for it
+    // pe5YAvg null → must NOT render a number for it
     expect(screen.queryByText(/5년 평균 PER 26/)).not.toBeInTheDocument();
   });
 

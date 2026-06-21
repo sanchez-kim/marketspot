@@ -318,8 +318,8 @@ export interface ValuationContext {
   status: DataStatus;
   asOf: string | null;
   peRatio: number | null;
-  pe5yAvg: number | null;
-  peVs5yAvgPct: number | null;
+  pe5YAvg: number | null;
+  peVs5YAvgPct: number | null;
   dividendYield: number | null;
   week52High: number | null;
   week52Low: number | null;
