@@ -84,7 +84,7 @@ class MacroConditionsService:
         )
 
     async def _cpi_metric(self) -> MacroMetric:
-        status, obs = await self._fred.observations("CPIAUCSL", 13)
+        status, obs = await self._fred.observations("CPIAUCSL", 15)
         y = yoy(obs)
         if y is None:
             return MacroMetric(

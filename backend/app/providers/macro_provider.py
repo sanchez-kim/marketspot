@@ -67,14 +67,24 @@ def parse_observations(payload: Mapping[str, object]) -> list[Observation]:
 
 
 def yoy(observations: Sequence[Observation]) -> float | None:
-    """전년 동월 대비 변화율(%). desc 정렬 가정: obs[0] 최신, obs[12] 1년 전."""
-    if len(observations) < 13:
+    """전년 동월 대비 변화율(%). desc 정렬 가정: observations[0] 이 최신.
+
+    날짜 기반으로 정확히 1년 전 관측치를 찾는다(위치 기반 아님).
+    중간에 결측 월이 있어도 올바른 전년 동월 데이터를 찾을 수 있다(gap-safe).
+    전년 동월 관측치가 없거나 값이 0이면 None을 반환한다.
+    """
+    if not observations:
         return None
-    cur = observations[0].value
-    prev = observations[12].value
-    if prev == 0:
+    latest = observations[0]
+    year_ago_date = latest.date.replace(year=latest.date.year - 1)
+    year_ago: Observation | None = None
+    for obs in observations:
+        if obs.date == year_ago_date:
+            year_ago = obs
+            break
+    if year_ago is None or year_ago.value == 0:
         return None
-    return (cur / prev - 1) * 100
+    return (latest.value / year_ago.value - 1) * 100
 
 
 def change(observations: Sequence[Observation]) -> float | None:
