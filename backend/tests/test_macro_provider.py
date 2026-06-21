@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import date
+
+import httpx
 
 from app.models import DataStatus
 from app.providers.macro_provider import (
@@ -74,3 +77,114 @@ async def test_observations_needs_key_without_network() -> None:
     status, obs = await prov.observations("CPIAUCSL", 13)
     assert status == DataStatus.NEEDS_KEY
     assert obs == []
+
+
+# ---------------------------------------------------------------------------
+# Fake httpx clients for network-free tests
+# ---------------------------------------------------------------------------
+
+
+class _FakeClientHTTPError:
+    """Async context manager whose .get() raises httpx.HTTPError."""
+
+    async def __aenter__(self) -> _FakeClientHTTPError:
+        return self
+
+    async def __aexit__(self, *_: object) -> None:
+        pass
+
+    async def get(self, *_: object, **__: object) -> object:
+        raise httpx.HTTPError("boom")
+
+
+class _FakeResponse:
+    """Fake response: raise_for_status is a no-op, .json() raises ValueError."""
+
+    def raise_for_status(self) -> None:
+        pass
+
+    def json(self) -> object:
+        raise ValueError("malformed body")
+
+
+class _FakeClientMalformedJSON:
+    """Async context manager whose .get() returns a bad-JSON response."""
+
+    async def __aenter__(self) -> _FakeClientMalformedJSON:
+        return self
+
+    async def __aexit__(self, *_: object) -> None:
+        pass
+
+    async def get(self, *_: object, **__: object) -> _FakeResponse:
+        return _FakeResponse()
+
+
+class _FakeResponseOK:
+    """Returns _CPI_PAYLOAD successfully."""
+
+    def raise_for_status(self) -> None:
+        pass
+
+    def json(self) -> object:
+        return _CPI_PAYLOAD
+
+
+class _FakeClientOK:
+    """Async context manager returning valid CPI payload."""
+
+    async def __aenter__(self) -> _FakeClientOK:
+        return self
+
+    async def __aexit__(self, *_: object) -> None:
+        pass
+
+    async def get(self, *_: object, **__: object) -> _FakeResponseOK:
+        return _FakeResponseOK()
+
+
+def _make_counting_factory() -> tuple[list[int], Callable[[], _FakeClientOK]]:
+    """Return (counter, factory); counter[0] increments on each factory call."""
+    counter: list[int] = [0]
+
+    def factory() -> _FakeClientOK:
+        counter[0] += 1
+        return _FakeClientOK()
+
+    return counter, factory
+
+
+async def test_observations_http_error_returns_error() -> None:
+    prov = FredMacroProvider(
+        api_key="testkey",
+        client_factory=lambda: _FakeClientHTTPError(),
+    )
+    status, obs = await prov.observations("CPIAUCSL", 13)
+    assert status == DataStatus.ERROR
+    assert obs == []
+
+
+async def test_observations_malformed_json_returns_error() -> None:
+    prov = FredMacroProvider(
+        api_key="testkey",
+        client_factory=lambda: _FakeClientMalformedJSON(),
+    )
+    status, obs = await prov.observations("CPIAUCSL", 13)
+    assert status == DataStatus.ERROR
+    assert obs == []
+
+
+async def test_observations_cache_hit_returns_delayed() -> None:
+    counter, factory = _make_counting_factory()
+    prov = FredMacroProvider(api_key="testkey", client_factory=factory)
+
+    status1, obs1 = await prov.observations("CPIAUCSL", 13)
+    assert status1 == DataStatus.DELAYED
+    assert len(obs1) == 13
+
+    status2, obs2 = await prov.observations("CPIAUCSL", 13)
+    assert status2 == DataStatus.DELAYED
+    assert obs2 == obs1
+
+    # client factory must have been called exactly once (cache hit on second call)
+    assert counter[0] == 1

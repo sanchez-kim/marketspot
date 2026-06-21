@@ -11,6 +11,7 @@ import time
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date
+from typing import Any, Protocol, runtime_checkable
 
 import httpx
 
@@ -19,6 +20,17 @@ from ..models import DataStatus
 
 _FRED_URL = "https://api.stlouisfed.org/fred/series/observations"
 _TTL = 6 * 3600.0  # 6시간 (거시 지표는 천천히 변함)
+
+
+@runtime_checkable
+class _HttpClient(Protocol):
+    """덕 타이핑: async context manager + GET 메서드."""
+
+    async def __aenter__(self) -> _HttpClient: ...
+
+    async def __aexit__(self, *args: Any) -> None: ...
+
+    async def get(self, url: str, *, params: Any = None) -> Any: ...
 
 
 @dataclass(frozen=True)
@@ -80,7 +92,7 @@ class FredMacroProvider:
         api_key: str,
         *,
         clock: Callable[[], float] = time.monotonic,
-        client_factory: Callable[[], httpx.AsyncClient] | None = None,
+        client_factory: Callable[[], _HttpClient] | None = None,
     ) -> None:
         self._key = api_key
         self._cache: TTLCache[list[Observation]] = TTLCache(clock=clock)
@@ -109,7 +121,8 @@ class FredMacroProvider:
                 resp = await client.get(_FRED_URL, params=params)
                 resp.raise_for_status()
                 payload = resp.json()
-        except httpx.HTTPError:  # 네트워크/HTTP 오류 → 상태로 변환(가짜 ❌)
+        # 네트워크/HTTP 오류 또는 malformed body → 상태로 변환(가짜 ❌)
+        except (httpx.HTTPError, ValueError):
             return DataStatus.ERROR, []
 
         obs = parse_observations(payload) if isinstance(payload, Mapping) else []
