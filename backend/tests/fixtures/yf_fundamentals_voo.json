@@ -1,0 +1,67 @@
+{
+ "info": {
+  "quoteType": "ETF",
+  "longName": "Vanguard S&P 500 ETF",
+  "shortName": "Vanguard S&P 500 ETF",
+  "trailingPE": 27.800974,
+  "dividendYield": 1.03,
+  "longBusinessSummary": "The fund manager employs an indexing investment approach designed to track the performance of the Standard & Poor's 500 Index, a widely recognized benchmark of U.S. stock market performance that is dominated by the stocks of large U.S. companies. The advisor attempts to replicate the target index by investing all, or substantially all, of its assets in the stocks that make up the index, holding each stock in approximately the same proportion as its weighting in the index. The fund is non-diversified.",
+  "category": "Large Blend",
+  "totalAssets": 1701513003008,
+  "currency": "USD",
+  "fiftyTwoWeekHigh": 699.15,
+  "fiftyTwoWeekLow": 545.75
+ },
+ "holdings": [
+  {
+   "symbol": "NVDA",
+   "name": "NVIDIA Corp",
+   "weight": 0.0783922
+  },
+  {
+   "symbol": "AAPL",
+   "name": "Apple Inc",
+   "weight": 0.0643954
+  },
+  {
+   "symbol": "MSFT",
+   "name": "Microsoft Corp",
+   "weight": 0.0489473
+  },
+  {
+   "symbol": "AMZN",
+   "name": "Amazon.com Inc",
+   "weight": 0.0418568
+  },
+  {
+   "symbol": "GOOGL",
+   "name": "Alphabet Inc Class A",
+   "weight": 0.036213502
+  },
+  {
+   "symbol": "AVGO",
+   "name": "Broadcom Inc",
+   "weight": 0.0319928
+  },
+  {
+   "symbol": "GOOG",
+   "name": "Alphabet Inc Class C",
+   "weight": 0.0288733
+  },
+  {
+   "symbol": "META",
+   "name": "Meta Platforms Inc Class A",
+   "weight": 0.021635499
+  },
+  {
+   "symbol": "TSLA",
+   "name": "Tesla Inc",
+   "weight": 0.0173501
+  },
+  {
+   "symbol": "BRK-B",
+   "name": "Berkshire Hathaway Inc Class B",
+   "weight": 0.0140383
+  }
+ ]
+}

@@ -1,0 +1,53 @@
+{
+ "quotes": [
+  {
+   "symbol": "PLT=F",
+   "quoteType": "FUTURE",
+   "shortname": "Platinum TAS Futures,Jul-2026",
+   "longname": null,
+   "exchDisp": "NY Mercantile"
+  },
+  {
+   "symbol": "PLTR",
+   "quoteType": "EQUITY",
+   "shortname": "Palantir Technologies Inc.",
+   "longname": "Palantir Technologies Inc.",
+   "exchDisp": "NASDAQ"
+  },
+  {
+   "symbol": "PLT.BK",
+   "quoteType": "EQUITY",
+   "shortname": "PLT_PILATUS MARINE",
+   "longname": "Pilatus Marine Public Company Limited",
+   "exchDisp": "SET"
+  },
+  {
+   "symbol": "PLTR.SW",
+   "quoteType": "EQUITY",
+   "shortname": "PALANTIR TECHN-A",
+   "longname": null,
+   "exchDisp": "Swiss"
+  },
+  {
+   "symbol": "PLTS",
+   "quoteType": "EQUITY",
+   "shortname": "Platinum Analytics Cayman Limit",
+   "longname": "Platinum Analytics Cayman Limited",
+   "exchDisp": "NASDAQ"
+  },
+  {
+   "symbol": "PLT-R.BK",
+   "quoteType": "EQUITY",
+   "shortname": "PLT_PILATUS MARINE",
+   "longname": "Pilatus Marine Public Company Limited",
+   "exchDisp": "SET"
+  },
+  {
+   "symbol": "PLTW",
+   "quoteType": "ETF",
+   "shortname": "Roundhill PLTR WeeklyPay ETF",
+   "longname": null,
+   "exchDisp": "BATS Trading"
+  }
+ ]
+}

@@ -1,0 +1,107 @@
+{
+ "cik": "0000036405",
+ "name": "VANGUARD INDEX FUNDS",
+ "tickers": [],
+ "filings": {
+  "recent": {
+   "accessionNumber": [
+    "0000036405-26-000325",
+    "0000036405-26-000323",
+    "0000036405-26-000324",
+    "0000036405-26-000322",
+    "0000036405-26-000321",
+    "0000036405-26-000320",
+    "0000036405-26-000319",
+    "0000036405-26-000318",
+    "0000036405-26-000316",
+    "0000036405-26-000317",
+    "0000036405-26-000315",
+    "0000036405-26-000314"
+   ],
+   "filingDate": [
+    "2026-05-28",
+    "2026-05-28",
+    "2026-05-28",
+    "2026-05-28",
+    "2026-05-28",
+    "2026-05-28",
+    "2026-05-28",
+    "2026-05-28",
+    "2026-05-28",
+    "2026-05-28",
+    "2026-05-28",
+    "2026-05-28"
+   ],
+   "reportDate": [
+    "2026-03-31",
+    "2026-03-31",
+    "2026-03-31",
+    "2026-03-31",
+    "2026-03-31",
+    "2026-03-31",
+    "2026-03-31",
+    "2026-03-31",
+    "2026-03-31",
+    "2026-03-31",
+    "2026-03-31",
+    "2026-03-31"
+   ],
+   "form": [
+    "NPORT-P",
+    "NPORT-P",
+    "NPORT-P",
+    "NPORT-P",
+    "NPORT-P",
+    "NPORT-P",
+    "NPORT-P",
+    "NPORT-P",
+    "NPORT-P",
+    "NPORT-P",
+    "NPORT-P",
+    "NPORT-P"
+   ],
+   "primaryDocument": [
+    "xslFormNPORT-P_X01/primary_doc.xml",
+    "xslFormNPORT-P_X01/primary_doc.xml",
+    "xslFormNPORT-P_X01/primary_doc.xml",
+    "xslFormNPORT-P_X01/primary_doc.xml",
+    "xslFormNPORT-P_X01/primary_doc.xml",
+    "xslFormNPORT-P_X01/primary_doc.xml",
+    "xslFormNPORT-P_X01/primary_doc.xml",
+    "xslFormNPORT-P_X01/primary_doc.xml",
+    "xslFormNPORT-P_X01/primary_doc.xml",
+    "xslFormNPORT-P_X01/primary_doc.xml",
+    "xslFormNPORT-P_X01/primary_doc.xml",
+    "xslFormNPORT-P_X01/primary_doc.xml"
+   ],
+   "primaryDocDescription": [
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ],
+   "acceptanceDateTime": [
+    "2026-05-28T20:39:55.000Z",
+    "2026-05-28T20:39:53.000Z",
+    "2026-05-28T20:39:50.000Z",
+    "2026-05-28T20:39:09.000Z",
+    "2026-05-28T20:39:08.000Z",
+    "2026-05-28T20:39:07.000Z",
+    "2026-05-28T20:38:56.000Z",
+    "2026-05-28T20:38:52.000Z",
+    "2026-05-28T20:38:42.000Z",
+    "2026-05-28T20:38:39.000Z",
+    "2026-05-28T20:38:33.000Z",
+    "2026-05-28T20:38:24.000Z"
+   ]
+  }
+ }
+}

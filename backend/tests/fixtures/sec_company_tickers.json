@@ -1,0 +1,27 @@
+{
+ "0": {
+  "cik_str": 1045810,
+  "ticker": "NVDA",
+  "title": "NVIDIA CORP"
+ },
+ "1": {
+  "cik_str": 320193,
+  "ticker": "AAPL",
+  "title": "Apple Inc."
+ },
+ "6": {
+  "cik_str": 1318605,
+  "ticker": "TSLA",
+  "title": "Tesla, Inc."
+ },
+ "7335": {
+  "cik_str": 1067839,
+  "ticker": "QQQ",
+  "title": "INVESCO QQQ TRUST, SERIES 1"
+ },
+ "7338": {
+  "cik_str": 884394,
+  "ticker": "SPY",
+  "title": "SPDR S&P 500 ETF TRUST"
+ }
+}

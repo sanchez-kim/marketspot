@@ -1,0 +1,22 @@
+# 비밀/로컬 데이터 — 절대 커밋 금지 (CLAUDE.md §3)
+.env
+data/
+**/settings.json
+**/cache.sqlite
+
+# Python
+backend/.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node / 프론트
+node_modules/
+frontend/dist/
+backend/static/
+
+# OS / 에디터
+.DS_Store
+*.log

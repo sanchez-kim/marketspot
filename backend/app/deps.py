@@ -1,0 +1,115 @@
+"""의존성 구성(컴포지션 루트).
+
+provider 체인과 서비스 싱글톤을 만든다. 키가 필요한 제공자(KIS/Alpaca)는
+키가 있을 때만 체인에 추가한다 — 그렇지 않으면 yfinance(키 불필요)만으로
+동작한다.
+"""
+
+from __future__ import annotations
+
+from functools import lru_cache
+
+from .config import load_settings
+from .providers.base import QuoteProvider
+from .providers.calendar_provider import YFinanceCalendarProvider
+from .providers.filings_provider import (
+    DartProvider,
+    FilingsProvider,
+    SecEdgarProvider,
+)
+from .providers.fundamentals_provider import YFinanceFundamentalsProvider
+from .providers.registry import ProviderRegistry
+from .providers.search_provider import SearchProvider, YahooSearchProvider
+from .providers.yfinance_provider import YFinanceProvider
+from .services.chart import ChartService
+from .services.filings import FilingsService
+from .services.home import HomeService
+from .services.macro import MacroService
+from .services.news import NewsAIService
+from .services.portfolio import PortfolioService
+from .services.quotes import QuoteService
+from .services.reassurance import ReassuranceService
+from .services.spark import SparkService
+
+
+def build_registry() -> ProviderRegistry:
+    yf = YFinanceProvider()
+    # MVP: 미국/한국 모두 yfinance 기본. KIS/Alpaca 는 키 연동 시 앞단에 추가.
+    us_chain: list[QuoteProvider] = [yf]
+    kr_chain: list[QuoteProvider] = [yf]
+    return ProviderRegistry({"US": us_chain, "KR": kr_chain})
+
+
+@lru_cache(maxsize=1)
+def get_registry() -> ProviderRegistry:
+    return build_registry()
+
+
+@lru_cache(maxsize=1)
+def get_quote_service() -> QuoteService:
+    return QuoteService(get_registry())
+
+
+@lru_cache(maxsize=1)
+def get_chart_service() -> ChartService:
+    return ChartService(get_registry())
+
+
+@lru_cache(maxsize=1)
+def get_macro_service() -> MacroService:
+    return MacroService(get_registry())
+
+
+@lru_cache(maxsize=1)
+def get_news_service() -> NewsAIService:
+    return NewsAIService()
+
+
+@lru_cache(maxsize=1)
+def get_portfolio_service() -> PortfolioService:
+    return PortfolioService(get_quote_service())
+
+
+@lru_cache(maxsize=1)
+def get_search_provider() -> SearchProvider:
+    return YahooSearchProvider()
+
+
+@lru_cache(maxsize=1)
+def get_fundamentals_provider() -> YFinanceFundamentalsProvider:
+    return YFinanceFundamentalsProvider()
+
+
+@lru_cache(maxsize=1)
+def get_calendar_provider() -> YFinanceCalendarProvider:
+    return YFinanceCalendarProvider()
+
+
+@lru_cache(maxsize=1)
+def get_spark_service() -> SparkService:
+    return SparkService(get_registry())
+
+
+@lru_cache(maxsize=1)
+def get_reassurance_service() -> ReassuranceService:
+    return ReassuranceService(get_registry(), get_search_provider())
+
+
+@lru_cache(maxsize=1)
+def get_home_service() -> HomeService:
+    return HomeService(
+        get_portfolio_service(),
+        get_reassurance_service(),
+        plan_loader=lambda: load_settings().plan,
+    )
+
+
+@lru_cache(maxsize=1)
+def get_filings_service() -> FilingsService:
+    # DART 키는 로컬 설정에서 읽는다(없으면 NEEDS_KEY 로 정직하게 표기).
+    dart_key = load_settings().api_keys.dart
+    providers: dict[str, FilingsProvider] = {
+        "US": SecEdgarProvider(),
+        "KR": DartProvider(api_key=dart_key),
+    }
+    return FilingsService(providers)
