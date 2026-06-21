@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { useQuery } from "@tanstack/react-query";
 import {
   DndContext,
   PointerSensor,
@@ -17,36 +16,19 @@ import {
   arrayMove,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { api } from "../api/client";
 import type { DashboardLayout } from "../api/types";
 import { useSettings, useUpdateSettings } from "../hooks/useSettings";
-import { DrawdownCard } from "./DrawdownCard";
 import { HomeWatchlist } from "./HomeWatchlist";
 import { HomeNews } from "./HomeNews";
 import { PortfolioSummaryCard } from "./PortfolioSummaryCard";
-import { PlanCard } from "./PlanCard";
 import { MarketMood } from "./MarketMood";
 import { UpcomingEvents } from "./UpcomingEvents";
 import { LearnCard } from "./LearnCard";
 import { SortableCard } from "./SortableCard";
 
-const TONE_CLASS: Record<string, string> = {
-  ON_TRACK: "v-ok",
-  NORMAL_DIP: "v-calm",
-  UNUSUAL: "v-warn",
-  NO_HOLDINGS: "v-muted",
-};
-const TONE_ICON: Record<string, string> = {
-  ON_TRACK: "✓",
-  NORMAL_DIP: "≈",
-  UNUSUAL: "!",
-  NO_HOLDINGS: "+",
-};
-
 // 카드 레지스트리 — id → 라벨·요소·기본 열
 type Col = "left" | "right";
 const CARD_DEFS: { id: string; label: string; el: ReactNode; col: Col }[] = [
-  { id: "plan", label: "투자원칙", el: <PlanCard />, col: "left" },
   {
     id: "portfolio",
     label: "포트폴리오 요약",
@@ -114,11 +96,6 @@ function Column({
 }
 
 export function HomeTab() {
-  const home = useQuery({
-    queryKey: ["home"],
-    queryFn: api.home,
-    refetchInterval: 60_000,
-  });
   const settings = useSettings();
   const update = useUpdateSettings();
 
@@ -206,8 +183,6 @@ export function HomeTab() {
     setCols((prev) => ({ ...prev, [col]: [...prev[col], id] }));
   };
 
-  const v = home.data;
-
   return (
     <div className="home">
       <div className="home-topbar">
@@ -218,20 +193,6 @@ export function HomeTab() {
           {editMode ? "✓ 완료" : "✎ 편집"}
         </button>
       </div>
-
-      {v && (
-        <>
-          <div className={`verdict ${TONE_CLASS[v.tone] ?? "v-muted"}`}>
-            <div className="verdict-icon">{TONE_ICON[v.tone] ?? "•"}</div>
-            <div className="verdict-text">
-              <div className="verdict-head">{v.headline}</div>
-              <div className="verdict-sub">{v.subline}</div>
-              <div className="verdict-todo">{v.todo}</div>
-            </div>
-          </div>
-          {v.context && <DrawdownCard ctx={v.context} />}
-        </>
-      )}
 
       {editMode && hidden.length > 0 && (
         <div className="dash-hidden">
