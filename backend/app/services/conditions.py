@@ -6,9 +6,10 @@ FRED 상태(NEEDS_KEY/ERROR 등)는 그대로 메트릭에 전파한다(가짜 �
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Callable, Sequence
 from datetime import UTC, datetime
-from typing import Protocol, runtime_checkable
+from typing import Protocol
 
 from ..models import (
     DataStatus,
@@ -20,13 +21,13 @@ from ..providers.macro_provider import Observation, change, yoy
 from ..providers.registry import ProviderRegistry
 
 
-@runtime_checkable
 class _FredLike(Protocol):
     """Structural interface for any FRED-like provider (enables test fakes)."""
 
     async def observations(
         self, series_id: str, limit: int
     ) -> tuple[DataStatus, list[Observation]]: ...
+
 
 # (라벨, yfinance 심볼) — 핵심 지수
 _INDICES = [
@@ -57,9 +58,9 @@ class MacroConditionsService:
         self._now = now
 
     async def get_conditions(self) -> MacroConditions:
-        rate = await self._rate_metric()
-        cpi = await self._cpi_metric()
-        indices = await self._index_trends()
+        rate, cpi, indices = await asyncio.gather(
+            self._rate_metric(), self._cpi_metric(), self._index_trends()
+        )
         return MacroConditions(rate=rate, cpi=cpi, indices=indices, as_of=self._now())
 
     async def _rate_metric(self) -> MacroMetric:

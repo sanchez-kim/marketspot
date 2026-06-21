@@ -50,7 +50,9 @@ class _IndexProvider:
         return DataEnvelope.ok(bars, source=self.name, status=DataStatus.DELAYED)
 
 
-def _service(fred_table: dict) -> MacroConditionsService:  # type: ignore[type-arg]
+def _service(
+    fred_table: dict[str, tuple[DataStatus, list[Observation]]],
+) -> MacroConditionsService:
     prov = _IndexProvider()
     registry = ProviderRegistry({"US": [prov], "KR": [prov]})
     fixed = datetime(2026, 6, 21, tzinfo=UTC)
@@ -58,10 +60,25 @@ def _service(fred_table: dict) -> MacroConditionsService:  # type: ignore[type-a
 
 
 def _cpi_obs() -> list[Observation]:
-    vals = [320.0 - i for i in range(13)]  # desc, 1년 전 = 308.0
-    return [Observation(date(2026, 5, 1), v) for v in vals[:1]] + [
-        Observation(date(2025, 12, 1), v) for v in vals[1:]
+    # 13 monthly observations, newest first (2026-05 … 2025-05), descending values.
+    # 1년 전 = index 12 = 308.0  →  yoy = (320 - 308) / 308 * 100 ≈ 3.9 (non-None)
+    months = [
+        date(2026, 5, 1),
+        date(2026, 4, 1),
+        date(2026, 3, 1),
+        date(2026, 2, 1),
+        date(2026, 1, 1),
+        date(2025, 12, 1),
+        date(2025, 11, 1),
+        date(2025, 10, 1),
+        date(2025, 9, 1),
+        date(2025, 8, 1),
+        date(2025, 7, 1),
+        date(2025, 6, 1),
+        date(2025, 5, 1),
     ]
+    vals = [320.0 - i for i in range(13)]
+    return [Observation(d, v) for d, v in zip(months, vals, strict=True)]
 
 
 async def test_conditions_combines_fred_and_index_trend() -> None:
