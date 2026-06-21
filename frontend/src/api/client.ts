@@ -8,9 +8,11 @@ import type {
   Fundamentals,
   HomeVerdict,
   Interval,
+  MacroConditions,
   NewsItem,
   NewsSummaryResult,
   Period,
+  PortfolioRisk,
   PortfolioSummary,
   Position,
   Quote,
@@ -18,6 +20,7 @@ import type {
   SettingsPatch,
   StripItem,
   SymbolMatch,
+  ValuationContext,
 } from "./types";
 
 async function postJSON<T>(url: string, body: unknown): Promise<T> {
@@ -136,6 +139,11 @@ export const api = {
 
   updatePortfolio: (positions: Position[]) =>
     putJSON<PortfolioSummary>(`/api/portfolio`, positions),
+
+  macroConditions: () => getJSON<MacroConditions>("/api/macro/conditions"),
+  portfolioRisk: () => getJSON<PortfolioRisk>("/api/portfolio/risk"),
+  valuation: (symbol: string) =>
+    getJSON<ValuationContext>(`/api/valuation/${encodeURIComponent(symbol)}`),
 
   settings: () => getJSON<SafeSettings>(`/api/settings`),
 

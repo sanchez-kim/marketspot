@@ -260,6 +260,76 @@ export interface Fundamentals {
   message: string | null;
 }
 
+// ── 근거 패널 (Decision Briefing) ────────────────────────────────────
+export interface MacroMetric {
+  label: string;
+  value: number | null;
+  unit: string | null;
+  asOf: string | null;
+  change: number | null;
+  status: DataStatus;
+  source: string;
+  note: string | null;
+}
+
+export interface IndexTrend {
+  label: string;
+  symbol: string;
+  price: number | null;
+  vsMa50Pct: number | null;
+  vsMa200Pct: number | null;
+  status: DataStatus;
+}
+
+export interface MacroConditions {
+  rate: MacroMetric;
+  cpi: MacroMetric;
+  indices: IndexTrend[];
+  asOf: string | null;
+}
+
+export interface HoldingWeight {
+  symbol: string;
+  weight: number;
+}
+
+export interface CorrelationPair {
+  a: string;
+  b: string;
+  corr: number;
+}
+
+export interface PortfolioRisk {
+  status: DataStatus;
+  asOf: string | null;
+  concentrationHhi: number | null;
+  topSymbol: string | null;
+  topWeight: number | null;
+  weights: HoldingWeight[];
+  correlations: CorrelationPair[];
+  avgCorrelation: number | null;
+  lookbackDays: number | null;
+  excluded: string[];
+  message: string | null;
+}
+
+export interface ValuationContext {
+  symbol: string;
+  status: DataStatus;
+  asOf: string | null;
+  peRatio: number | null;
+  pe5yAvg: number | null;
+  peVs5yAvgPct: number | null;
+  dividendYield: number | null;
+  week52High: number | null;
+  week52Low: number | null;
+  week52PositionPct: number | null;
+  price: number | null;
+  vsMa200Pct: number | null;
+  note: string | null;
+  message: string | null;
+}
+
 export const PERIODS = ["1M", "3M", "6M", "1Y", "2Y", "5Y", "10Y"] as const;
 export const INTERVALS = ["1D", "1W", "1M"] as const;
 export type Period = (typeof PERIODS)[number];
