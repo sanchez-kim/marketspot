@@ -11,12 +11,20 @@ from app.services.risk import RiskService
 
 
 class _BarsProvider:
-    """심볼별로 미리 정한 종가열을 봉으로 돌려주는 fake(시세는 종가=가격)."""
+    """심볼별로 미리 정한 종가열을 봉으로 돌려주는 fake(시세는 종가=가격).
+
+    no_bars: 이 집합에 속한 심볼은 quote(가격)는 있지만 bar 이력이 없는 것으로 취급.
+    """
 
     name = "fake-bars"
 
-    def __init__(self, series: dict[str, list[float]]) -> None:
+    def __init__(
+        self,
+        series: dict[str, list[float]],
+        no_bars: set[str] | None = None,
+    ) -> None:
         self._series = series
+        self._no_bars: set[str] = {s.upper() for s in (no_bars or set())}
 
     async def get_quote(self, symbol: str) -> DataEnvelope:  # type: ignore[type-arg]
         from app.models import Quote
@@ -35,8 +43,9 @@ class _BarsProvider:
     async def get_bars(
         self, symbol: str, period: str, interval: str
     ) -> DataEnvelope[list[Bar]]:
-        closes = self._series.get(symbol.upper())
-        if not closes:
+        upper = symbol.upper()
+        closes = self._series.get(upper)
+        if not closes or upper in self._no_bars:
             return DataEnvelope[list[Bar]].empty(
                 source=self.name, status=DataStatus.NO_DATA
             )
@@ -56,8 +65,11 @@ class _BarsProvider:
         )
 
 
-def _service(series: dict[str, list[float]]) -> RiskService:
-    prov = _BarsProvider(series)
+def _service(
+    series: dict[str, list[float]],
+    no_bars: set[str] | None = None,
+) -> RiskService:
+    prov = _BarsProvider(series, no_bars=no_bars)
     registry = ProviderRegistry({"US": [prov], "KR": [prov]})
     positions = [Position(symbol=s, quantity=1.0, avg_cost=1.0) for s in series]
     portfolio = PortfolioService(_QuoteSvc(registry), lambda: positions)  # type: ignore[arg-type]  # duck-typed fake for tests
@@ -99,3 +111,18 @@ async def test_risk_empty_portfolio_is_no_data() -> None:
     risk = await svc.get_risk()
     assert risk.status == DataStatus.NO_DATA
     assert risk.message is not None
+
+
+async def test_risk_partial_exclusion_bar_less_symbol() -> None:
+    # CCC has a price (quote) but NO bar history → must appear in excluded.
+    # DDD has full bar history → contributes to the return series.
+    # With only one symbol having returns, correlations must be empty.
+    svc = _service(
+        {"CCC": [50.0, 55.0, 60.0], "DDD": [100.0, 110.0, 121.0]},
+        no_bars={"CCC"},
+    )
+    risk = await svc.get_risk()
+    assert risk.status == DataStatus.DELAYED
+    assert "CCC" in risk.excluded
+    assert "DDD" not in risk.excluded
+    assert risk.correlations == []

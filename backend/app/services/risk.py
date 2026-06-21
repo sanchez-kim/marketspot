@@ -47,10 +47,12 @@ class RiskService:
 
         # 1년 일봉을 모아 공통 거래일로 정렬 → 상관 계산
         series: dict[str, list[Bar]] = {}
+        bar_statuses: list[DataStatus] = []
         for v in valued:
             env = await self._registry.get_bars(v.symbol, _PERIOD, _INTERVAL)
             if env.data is not None and env.status in _HAS_DATA:
                 series[v.symbol.upper()] = env.data
+                bar_statuses.append(env.status)
         symbols, matrix = aligned_closes(series)
         returns = [pct_returns(row) for row in matrix]
 
@@ -70,8 +72,18 @@ class RiskService:
         lookback = len(matrix[0]) if matrix else None
         as_of: datetime | None = summary.as_of
 
+        # Worst-case bar status: STALE > DELAYED > LIVE; default DELAYED if no bars.
+        if DataStatus.STALE in bar_statuses:
+            result_status = DataStatus.STALE
+        elif DataStatus.DELAYED in bar_statuses:
+            result_status = DataStatus.DELAYED
+        elif DataStatus.LIVE in bar_statuses:
+            result_status = DataStatus.LIVE
+        else:
+            result_status = DataStatus.DELAYED
+
         return PortfolioRisk(
-            status=DataStatus.DELAYED,
+            status=result_status,
             as_of=as_of,
             concentration_hhi=round(hhi, 4),
             top_symbol=top.symbol.upper(),
