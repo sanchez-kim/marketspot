@@ -4,12 +4,20 @@ import { api } from "../api/client";
 import { changeClass, formatPct } from "../lib/format";
 import { useSettings, useUpdateSettings } from "../hooks/useSettings";
 import { useUIStore } from "../store/uiStore";
+import {
+  useMacroConditions,
+  usePortfolioRisk,
+  useValuation,
+} from "../hooks/useEvidence";
 import { ChartPanel } from "./ChartPanel";
 import { DrawdownCard } from "./DrawdownCard";
 import { FilingsTab } from "./FilingsTab";
 import { FundamentalsCard } from "./FundamentalsCard";
+import { MacroPanel } from "./MacroPanel";
 import { NewsTab } from "./NewsTab";
+import { RiskPanel } from "./RiskPanel";
 import { SymbolSearch } from "./SymbolSearch";
+import { ValuationPanel } from "./ValuationPanel";
 
 type Section = "info" | "chart" | "news" | "filings";
 const SECTIONS: { id: Section; label: string }[] = [
@@ -20,11 +28,11 @@ const SECTIONS: { id: Section; label: string }[] = [
 ];
 
 /**
- * 종목 상세 — 한 종목에 대한 모든 것: 하락 맥락 + 차트 + 뉴스 + 공시.
+ * 종목 상세 — 한 종목에 대한 모든 것: 결정 브리핑(근거 4축) + 차트 + 뉴스 + 공시.
  * 좌측 관심종목 레일에서 바로 클릭해 전환하거나, 검색으로 다른 종목을 본다.
  */
 export function SymbolTab() {
-  const { symbol, setSymbol } = useUIStore();
+  const { symbol, setSymbol, reviewMode, setReviewMode, askAi } = useUIStore();
   const [section, setSection] = useState<Section>("info");
   const settings = useSettings();
   const update = useUpdateSettings();
@@ -48,6 +56,11 @@ export function SymbolTab() {
     queryKey: ["context", symbol],
     queryFn: () => api.context(symbol),
   });
+
+  // 근거 축 훅
+  const val = useValuation(symbol);
+  const macro = useMacroConditions();
+  const risk = usePortfolioRisk();
 
   return (
     <div className="symbol">
@@ -85,7 +98,52 @@ export function SymbolTab() {
             {isWatched ? "★ 관심종목" : "☆ 관심종목 추가"}
           </button>
         </div>
-        <DrawdownCard ctx={ctx.data ?? null} />
+
+        {/* ── 결정 브리핑 ────────────────────────────────────────── */}
+        <div className="briefing">
+          <div className="briefing-head">
+            <span className="briefing-title">결정 브리핑 · {symbol}</span>
+            <div className="review-toggle" role="group" aria-label="검토 모드">
+              {(
+                [
+                  ["add", "추가매수"],
+                  ["hold", "보유점검"],
+                  ["new", "신규편입"],
+                ] as const
+              ).map(([m, label]) => (
+                <button
+                  key={m}
+                  className={reviewMode === m ? "rt on" : "rt"}
+                  onClick={() => setReviewMode(m)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="ev-grid">
+            <ValuationPanel data={val.data ?? null} />
+            <DrawdownCard ctx={ctx.data ?? null} />
+            {/* ② 기저율 — 기존 컴포넌트 재사용 */}
+            <MacroPanel data={macro.data ?? null} />
+            <RiskPanel data={risk.data ?? null} mode={reviewMode} />
+          </div>
+          <div className="briefing-foot">
+            <span>사실만 차려줌 — 판단은 당신.</span>
+            <button
+              className="ai-explain"
+              onClick={() =>
+                askAi(
+                  `${symbol}의 근거 4축(밸류·기저율·거시·포트폴리오)을 초보자에게 쉽게 설명해줘. 예측·매수매도 말고 사실 위주로.`,
+                )
+              }
+            >
+              ✦ AI에게 설명 요청
+            </button>
+          </div>
+        </div>
+
+        {/* ── 보조 근거: 차트 · 뉴스 · 공시 ─────────────────────── */}
         <div className="seg sym-seg">
           {SECTIONS.map((s) => (
             <button

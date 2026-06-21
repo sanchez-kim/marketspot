@@ -1654,3 +1654,67 @@ body {
   color: var(--accent, #5b9dff);
   font-weight: 600;
 }
+
+/* ── 결정 브리핑 레이아웃 ───────────────────────────────────────── */
+.briefing {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.briefing-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.briefing-title {
+  font-weight: 700;
+  font-size: 15px;
+}
+.review-toggle {
+  display: inline-flex;
+  gap: 2px;
+  background: var(--panel, #14181f);
+  border: 1px solid var(--border, #232a35);
+  border-radius: 6px;
+  padding: 2px;
+}
+.review-toggle .rt {
+  background: transparent;
+  border: 0;
+  color: var(--muted, #8b94a3);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.review-toggle .rt.on {
+  background: var(--accent, #5b9dff);
+  color: #fff;
+}
+.ev-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+@media (max-width: 760px) {
+  .ev-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.briefing-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--muted, #8b94a3);
+}
+.ai-explain {
+  background: transparent;
+  border: 1px solid var(--accent, #5b9dff);
+  color: var(--accent, #5b9dff);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
