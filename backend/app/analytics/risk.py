@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import itertools
 from collections.abc import Mapping, Sequence
+from datetime import date
 from math import sqrt
 
 from ..models import Bar
@@ -32,7 +33,7 @@ def pct_returns(closes: Sequence[float]) -> list[float]:
     """
     out: list[float] = []
     for prev, cur in itertools.pairwise(closes):
-        if prev:
+        if prev != 0:
             out.append(round(cur / prev - 1, 10))
     return out
 
@@ -54,7 +55,7 @@ def pearson(a: Sequence[float], b: Sequence[float]) -> float | None:
     return cov / sqrt(va * vb)
 
 
-def _closes_by_date(bars: Sequence[Bar]) -> dict[object, float]:
+def _closes_by_date(bars: Sequence[Bar]) -> dict[date, float]:
     return {b.time.date(): b.close for b in bars}
 
 
@@ -70,7 +71,7 @@ def aligned_closes(
     if not present:
         return [], []
     common = set.intersection(*(set(m.keys()) for _, m in present))
-    dates = sorted(common)  # type: ignore[type-var]
+    dates = sorted(common)
     symbols = [s for s, _ in present]
     matrix = [[m[d] for d in dates] for _, m in present]
     return symbols, matrix
