@@ -22,6 +22,9 @@ interface UIState {
   aiThink: boolean; // 사고(thinking) 모드 — 느리지만 더 깊은 추론
   aiPending: string | null; // 외부에서 코치에게 보낼 질문(자동 전송)
   exploreMode: boolean; // 탐구 모드(RSI/MACD 등). 기본 off=차분
+  // 결정 브리핑 검토모드 — ④패널 강조점만 바꾼다(추가매수/보유점검/신규편입)
+  reviewMode: "add" | "hold" | "new";
+  setReviewMode: (m: "add" | "hold" | "new") => void;
 
   setTab: (t: TabId) => void;
   setSymbol: (s: string) => void;
@@ -53,6 +56,8 @@ export const useUIStore = create<UIState>((set) => ({
   aiThink: false,
   aiPending: null,
   exploreMode: false,
+  reviewMode: "add",
+  setReviewMode: (reviewMode) => set({ reviewMode }),
 
   setTab: (activeTab) => set({ activeTab }),
   setSymbol: (symbol) => set({ symbol }),

@@ -1606,3 +1606,51 @@ body {
   white-space: pre-wrap;
   line-height: 1.6;
 }
+
+/* 근거 4축 패널 (결정 브리핑) */
+.ev-panel {
+  background: var(--panel, #14181f);
+  border: 1px solid var(--border, #232a35);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ev-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ev-title {
+  font-weight: 600;
+  font-size: 13px;
+}
+.ev-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ev-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+.ev-row span {
+  color: var(--muted, #8b94a3);
+}
+.ev-note {
+  margin: 4px 0 0;
+  font-size: 11px;
+  color: var(--muted, #8b94a3);
+  line-height: 1.4;
+}
+.ev-empty {
+  font-size: 12px;
+  color: var(--muted, #8b94a3);
+  padding: 8px 0;
+}
+.ev-emph {
+  color: var(--accent, #5b9dff);
+  font-weight: 600;
+}
