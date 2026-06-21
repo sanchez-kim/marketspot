@@ -3,8 +3,8 @@ import { useUpdateSettings } from "../hooks/useSettings";
 import { Logo } from "./Logo";
 
 const TABS: { id: TabId; label: string }[] = [
-  { id: "home", label: "홈" },
-  { id: "symbol", label: "종목" },
+  { id: "home", label: "코크핏" },
+  { id: "symbol", label: "결정 브리핑" },
   { id: "portfolio", label: "포트폴리오" },
 ];
 

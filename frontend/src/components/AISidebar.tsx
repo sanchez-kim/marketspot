@@ -7,30 +7,34 @@ import { useUIStore } from "../store/uiStore";
 
 const HAS_DATA = ["LIVE", "DELAYED", "STALE"];
 
-// 선제 코치: 현재 종목의 하락 맥락으로 *코치가 먼저 거는 말* + 상황 맞춤 질문을
-// 만든다(규칙기반, 즉시·정직 — 예측 안 함).
+// 선제 설명자: 현재 종목의 맥락으로 *근거 설명자가 먼저 거는 말* + 설명 유도 질문을
+// 만든다(규칙기반, 즉시·정직 — 예측·매수매도 안 함).
 function buildIntro(
   symbol: string,
   ctx: DrawdownContext | undefined,
 ): { greeting: string; chips: string[] } {
   const chips: string[] = [];
-  let mood = "무엇이든 편하게 물어보세요.";
   const dd = ctx && HAS_DATA.includes(ctx.status) ? ctx.currentDrawdownPct : null;
 
+  let ddContext = "";
   if (dd != null) {
     const p = dd.toFixed(1);
-    if (dd <= -10) mood = `${symbol}는 지금 고점 대비 ${p}% — 꽤 깊은 조정 구간이에요.`;
-    else if (dd <= -3) mood = `오늘 좀 빨갛죠. ${symbol}는 고점 대비 ${p}% 수준이에요.`;
-    else mood = `${symbol}는 고점 대비 ${p}% — 비교적 안정적인 흐름이에요.`;
-    if (dd <= -3) chips.push("이 하락 정상이야?");
+    if (dd <= -10) ddContext = ` 현재 ${symbol}는 고점 대비 ${p}% 구간에 있어요.`;
+    else if (dd <= -3) ddContext = ` 현재 ${symbol}는 고점 대비 ${p}% 수준이에요.`;
+    else ddContext = ` 현재 ${symbol}는 고점 대비 ${p}% 수준이에요.`;
   }
 
-  chips.push(`${symbol} 지금 어때?`);
-  chips.push("지금 적립해도 괜찮은 구간이야?");
-  chips.push("RSI가 70을 넘으면 무슨 뜻이야?");
+  const greeting =
+    `${symbol}의 근거(밸류·기저율·거시·포트폴리오)를 설명해 드릴게요.${ddContext} ` +
+    `예측·매수매도는 하지 않아요.`;
+
+  chips.push("PER이 무슨 뜻이야?");
+  chips.push("지금 과열인지 어떻게 봐?");
+  chips.push("기저율은 어떻게 읽어?");
+  chips.push("내 포트폴리오에 어떤 영향?");
 
   return {
-    greeting: `${mood} (예측·매수매도 조언은 하지 않아요.)`,
+    greeting,
     chips: chips.slice(0, 4),
   };
 }
@@ -106,7 +110,7 @@ export function AISidebar() {
   return (
     <aside className="ai-side">
       <div className="ai-side-head">
-        <span className="ai-side-title">✦ AI 코치</span>
+        <span className="ai-side-title">✦ AI 설명자</span>
         <div className="ai-side-actions">
           <button
             className={`ai-think ${aiThink ? "on" : ""}`}
