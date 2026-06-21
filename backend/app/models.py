@@ -291,6 +291,42 @@ class PortfolioRisk(CamelModel):
     message: str | None = None
 
 
+# ---- 거시 환경(근거 ③) ------------------------------------------------------
+
+
+class MacroMetric(CamelModel):
+    """거시 지표 한 건(금리/CPI 등). 예측 없이 발표값·방향만."""
+
+    label: str
+    value: float | None = None
+    unit: str | None = None  # "%" 등
+    as_of: date | None = None  # 발표/기준일
+    change: float | None = None  # 직전 대비(방향)
+    status: DataStatus
+    source: str
+    note: str | None = None
+
+
+class IndexTrend(CamelModel):
+    """지수의 이동평균선 대비 위치(과열/침체 단서). 예측 ❌."""
+
+    label: str
+    symbol: str
+    price: float | None = None
+    vs_ma50_pct: float | None = None  # (price/MA50 - 1) * 100
+    vs_ma200_pct: float | None = None  # (price/MA200 - 1) * 100
+    status: DataStatus
+
+
+class MacroConditions(CamelModel):
+    """근거 ③ '거시 환경': 기준금리 + CPI + 핵심 지수 추세."""
+
+    rate: MacroMetric
+    cpi: MacroMetric
+    indices: list[IndexTrend] = []
+    as_of: datetime | None = None
+
+
 # ---- 심볼 검색 (자동완성) ----------------------------------------------------
 
 

@@ -7,6 +7,7 @@ provider 체인과 서비스 싱글톤을 만든다. 키가 필요한 제공자(
 
 from __future__ import annotations
 
+import os
 from functools import lru_cache
 
 from .config import load_settings
@@ -18,10 +19,12 @@ from .providers.filings_provider import (
     SecEdgarProvider,
 )
 from .providers.fundamentals_provider import YFinanceFundamentalsProvider
+from .providers.macro_provider import FredMacroProvider
 from .providers.registry import ProviderRegistry
 from .providers.search_provider import SearchProvider, YahooSearchProvider
 from .providers.yfinance_provider import YFinanceProvider
 from .services.chart import ChartService
+from .services.conditions import MacroConditionsService
 from .services.filings import FilingsService
 from .services.home import HomeService
 from .services.macro import MacroService
@@ -119,3 +122,14 @@ def get_filings_service() -> FilingsService:
         "KR": DartProvider(api_key=dart_key),
     }
     return FilingsService(providers)
+
+
+def _fred_key() -> str:
+    # settings.json 우선, 없으면 .env 의 FRED_API_KEY 사용(정직: 둘 다 없으면 빈 문자열)
+    return load_settings().api_keys.fred or os.environ.get("FRED_API_KEY", "")
+
+
+@lru_cache(maxsize=1)
+def get_conditions_service() -> MacroConditionsService:
+    fred = FredMacroProvider(_fred_key())
+    return MacroConditionsService(fred, get_registry())
