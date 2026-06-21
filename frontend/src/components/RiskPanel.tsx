@@ -48,7 +48,7 @@ export function RiskPanel({
           </b>
         </div>
         <div className="ev-row">
-          <span>평균 ρ(corr)</span>
+          <span>평균 상관</span>
           <b>{data.avgCorrelation === null ? "—" : data.avgCorrelation.toFixed(2)}</b>
         </div>
         {data.excluded.length > 0 && (

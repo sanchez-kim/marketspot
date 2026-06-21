@@ -35,7 +35,7 @@ describe("RiskPanel", () => {
     rerender(<RiskPanel data={data} mode="hold" />);
     expect(screen.getByText(/현재 비중|보유/)).toBeInTheDocument();
     rerender(<RiskPanel data={data} mode="new" />);
-    expect(screen.getByText(/분산|상관/)).toBeInTheDocument();
+    expect(screen.getByText(/기존 보유와의/)).toBeInTheDocument();
   });
 
   it("shows NO_DATA message when empty (no fabricated numbers)", () => {
