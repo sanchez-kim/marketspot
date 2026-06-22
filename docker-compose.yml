@@ -1,5 +1,5 @@
 # MarketSpot 개발용 한방 구성 (개인 로컬 전용 — dev only, prod 분리 없음).
-#   docker compose up        # 백엔드(8000) + 프론트(5173) 동시 기동
+#   docker compose up        # 백엔드(8000) + 프론트(4000) 동시 기동
 #   docker compose up --build # 의존성/Dockerfile 바뀌었을 때
 # 코드는 볼륨 마운트라 편집 즉시 반영(백엔드 uvicorn --reload, 프론트 Vite HMR).
 # Ollama 는 호스트(11434)의 기존 인스턴스를 재사용한다(모델 재다운로드 X).
@@ -26,7 +26,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "5173:5173"
+      - "4000:4000"
     volumes:
       - ./frontend:/app # 라이브 소스
       - /app/node_modules # 컨테이너 node_modules 보존(호스트가 덮어쓰지 않게)

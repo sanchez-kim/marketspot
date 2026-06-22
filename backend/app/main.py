@@ -34,9 +34,9 @@ app = FastAPI(
     description="MarketSpot — ETF 투자자를 위한 로컬 금융 리서치 터미널 백엔드",
 )
 
-# 로컬 개발: Vite dev 서버(5173)에서의 호출 허용
+# 로컬 개발: Vite dev 서버(4000)에서의 호출 허용
 _dev_origins = os.environ.get(
-    "CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
+    "CORS_ORIGINS", "http://localhost:4000,http://127.0.0.1:4000"
 ).split(",")
 app.add_middleware(
     CORSMiddleware,

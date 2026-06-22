@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
-EXPOSE 5173
+EXPOSE 4000
 
 # --host 0.0.0.0: 컨테이너 밖(호스트 브라우저)에서 접근 가능하게.
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

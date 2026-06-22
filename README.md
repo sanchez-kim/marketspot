@@ -28,7 +28,7 @@
 ### 권장: Docker Compose 한 방 (개발용, 핫리로드)
 ```bash
 docker compose up
-#   브라우저 → http://localhost:5173   (백엔드 :8000)
+#   브라우저 → http://localhost:4000   (백엔드 :8000)
 #   코드 편집 즉시 반영(백엔드 --reload, 프론트 Vite HMR)
 #   AI는 호스트의 Ollama(:11434)를 재사용한다(컨테이너에 모델 재다운로드 X)
 docker compose up --build   # Dockerfile/의존성 바뀐 경우
@@ -48,7 +48,7 @@ SEC_USER_AGENT="MarketSpot/0.1 (local; you@example.com)" \
   .venv/bin/uvicorn app.main:app --port 8000
 
 # 프론트 (새 터미널)
-cd frontend && npm run dev    # http://localhost:5173 (/api → :8000 프록시)
+cd frontend && npm run dev    # http://localhost:4000 (/api → :8000 프록시)
 ```
 
 ---
