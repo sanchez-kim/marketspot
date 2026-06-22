@@ -1,7 +1,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { act, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AISidebar } from "./AISidebar";
+import { api } from "../api/client";
 import { useUIStore } from "../store/uiStore";
 
 function renderSidebar() {
@@ -23,5 +24,49 @@ describe("AISidebar explainer tone", () => {
     // intro mentions explaining the evidence, not "그냥 두세요/안심"
     expect(screen.getAllByText(/근거|설명/).length).toBeGreaterThan(0);
     expect(screen.queryByText(/아무것도 하지|그냥 두세요/)).not.toBeInTheDocument();
+  });
+});
+
+describe("AISidebar pending-question queue", () => {
+  beforeEach(() => {
+    useUIStore.setState({
+      aiOpen: true,
+      aiMessages: [],
+      symbol: "VOO",
+      aiPending: null,
+    });
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("does not drop a question queued while a previous answer is still streaming", async () => {
+    let resolveFirst!: () => void;
+    const asked: string[] = [];
+    vi.spyOn(api, "aiAskStream").mockImplementation(
+      async (_ctx: string, question: string) => {
+        asked.push(question);
+        if (asked.length === 1) {
+          await new Promise<void>((res) => {
+            resolveFirst = res;
+          });
+        }
+        return "ollama";
+      },
+    );
+    renderSidebar();
+
+    // Q1 auto-sends via aiPending and starts streaming (stays in flight).
+    act(() => useUIStore.getState().askAi("질문1"));
+    await waitFor(() => expect(asked).toContain("질문1"));
+
+    // Q2 queued WHILE Q1 is still streaming — must not be silently dropped.
+    act(() => useUIStore.getState().askAi("질문2"));
+
+    // Q1 finishes; Q2 should then be sent.
+    await act(async () => {
+      resolveFirst();
+    });
+    await waitFor(() => expect(asked).toContain("질문2"));
   });
 });

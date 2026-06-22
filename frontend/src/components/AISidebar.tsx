@@ -69,15 +69,17 @@ export function AISidebar() {
   }, [aiMessages, sending]);
 
   // 외부(예: 기본정보의 '쉽게 설명')에서 들어온 질문을 한 번 자동 전송.
+  // ★ sending 을 의존성에 포함 — 스트리밍 중 들어온 질문은 한 번 스킵되지만,
+  //   전송이 끝나(sending=false) effect 가 다시 돌 때 비로소 전송된다(침묵 드롭 방지).
   useEffect(() => {
     if (aiPending && !sending) {
       const q = aiPending;
       clearAiPending();
       void send(q);
     }
-    // send/sending 은 의도적으로 제외 — aiPending 이 들어올 때 한 번만 전송한다.
+    // send 만 의도적으로 제외(매 렌더 재생성 → 루프 방지). aiPending/sending 으로 충분.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [aiPending]);
+  }, [aiPending, sending]);
 
   if (!aiOpen) return null;
 
