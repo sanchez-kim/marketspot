@@ -53,6 +53,15 @@ class YFinanceProvider:
             # ★ yfinance 는 동기(blocking) — 스레드로 오프로드해 이벤트 루프를
             #   막지 않게 한다(동시 요청이 진짜 병렬로 처리됨).
             quote = await asyncio.to_thread(_fetch_quote, yf, symbol)
+        except KeyError as exc:
+            # yfinance FastInfo 는 데이터 없는 심볼에서 KeyError
+            # (예: 'exchangeTimezoneName')를 던진다 — 시스템 오류가 아니라
+            # "그 종목이 없다"는 뜻이므로 ERROR 가 아니라 NO_DATA 로 정직히 표기.
+            return DataEnvelope[Quote].empty(
+                source=self.name,
+                status=DataStatus.NO_DATA,
+                message=f"'{symbol}' 시세를 찾을 수 없습니다 ({exc})",
+            )
         except Exception as exc:  # noqa: BLE001
             return DataEnvelope[Quote].empty(
                 source=self.name,
@@ -121,9 +130,15 @@ class YFinanceProvider:
     def _envelope_with_freshness(
         self, symbol: str, quote: Quote
     ) -> DataEnvelope[Quote]:
-        # 무료 yfinance 미국 시세는 지연. 한국 종목도 비공식 경로라 지연 가능.
-        status = DataStatus.DELAYED
-        delay = _US_DELAY_MINUTES
+        # 미국 무료 시세는 ~15분 지연(DELAYED). 한국 등 그 외 시장은 yfinance
+        # 가 전일 종가(end-of-day)를 주므로 STALE 로 정직히 표기한다 — bars 경로
+        # (get_bars)와 동일 기준. US 의 15분 지연 의미를 KR 에 붙이지 않는다.
+        if market_of(symbol) == "US":
+            status = DataStatus.DELAYED
+            delay: int | None = _US_DELAY_MINUTES
+        else:
+            status = DataStatus.STALE
+            delay = None
         return DataEnvelope.ok(
             quote,
             source=self.name,

@@ -68,7 +68,15 @@ class RiskService:
                     corr_values.append(c)
 
         avg = round(sum(corr_values) / len(corr_values), 2) if corr_values else None
-        excluded = [v.symbol.upper() for v in valued if v.symbol.upper() not in symbols]
+        # 상관 계산에 실제 기여한 심볼(symbols) 외의 *모든* 보유 종목을 제외로
+        # 표기한다 — 시세가 없어 평가조차 안 된 종목(unvalued)과 가격은 있으나
+        # bar 이력이 없는 종목 둘 다 포함(가짜 ❌, 침묵 누락 ❌).
+        included = {s.upper() for s in symbols}
+        excluded = [
+            p.symbol.upper()
+            for p in summary.positions
+            if p.symbol.upper() not in included
+        ]
         lookback = len(matrix[0]) if matrix else None
         as_of: datetime | None = summary.as_of
 

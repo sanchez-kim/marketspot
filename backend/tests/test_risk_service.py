@@ -126,3 +126,19 @@ async def test_risk_partial_exclusion_bar_less_symbol() -> None:
     assert "CCC" in risk.excluded
     assert "DDD" not in risk.excluded
     assert risk.correlations == []
+
+
+async def test_risk_excludes_position_with_no_quote() -> None:
+    # GGG has no quote at all (unvalued — no price) so it never enters the
+    # weighted analysis. The PortfolioRisk.excluded contract ("시세/이력 없어
+    # 상관 계산 제외") requires it to be disclosed, not silently dropped.
+    prov = _BarsProvider({"FFF": [100.0, 110.0, 121.0]})
+    registry = ProviderRegistry({"US": [prov], "KR": [prov]})
+    positions = [
+        Position(symbol="FFF", quantity=1.0, avg_cost=1.0),
+        Position(symbol="GGG", quantity=1.0, avg_cost=1.0),
+    ]
+    portfolio = PortfolioService(_QuoteSvc(registry), lambda: positions)  # type: ignore[arg-type]
+    risk = await RiskService(registry, portfolio).get_risk()
+    assert "GGG" in risk.excluded
+    assert "FFF" not in risk.excluded

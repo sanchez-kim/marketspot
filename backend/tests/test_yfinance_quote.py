@@ -6,7 +6,11 @@
 
 from __future__ import annotations
 
-from app.providers.yfinance_provider import quote_from_fast_info
+import pytest
+
+from app.models import DataStatus, Quote
+from app.providers import yfinance_provider
+from app.providers.yfinance_provider import YFinanceProvider, quote_from_fast_info
 
 
 class FakeFastInfo:
@@ -54,3 +58,45 @@ def test_no_price_returns_none() -> None:
         pass
 
     assert quote_from_fast_info("X", Empty()) is None
+
+
+async def test_unknown_symbol_is_no_data_not_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # yfinance fast_info raises KeyError('exchangeTimezoneName') for symbols it
+    # has no data for. That's a data-availability gap (NO_DATA), not a system
+    # failure (ERROR) — reporting ERROR misleads the user into thinking the app
+    # is broken when the ticker simply does not exist.
+    def boom(_yf: object, _sym: str) -> Quote | None:
+        raise KeyError("exchangeTimezoneName")
+
+    monkeypatch.setattr(yfinance_provider, "_fetch_quote", boom)
+    env = await YFinanceProvider().get_quote("ZZZZNOTREAL")
+    assert env.status is DataStatus.NO_DATA
+    assert env.data is None
+
+
+async def test_korean_quote_is_stale_not_delayed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # KR data via yfinance is end-of-day, not 15-min delayed. Bars already report
+    # STALE; the quote path must agree instead of claiming US-style DELAYED/15.
+    monkeypatch.setattr(
+        yfinance_provider,
+        "_fetch_quote",
+        lambda _yf, sym: Quote(symbol=sym, price=70000.0),
+    )
+    env = await YFinanceProvider().get_quote("005930.KS")
+    assert env.status is DataStatus.STALE
+    assert env.delay_minutes is None
+
+
+async def test_us_quote_stays_delayed(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        yfinance_provider,
+        "_fetch_quote",
+        lambda _yf, sym: Quote(symbol=sym, price=688.1),
+    )
+    env = await YFinanceProvider().get_quote("VOO")
+    assert env.status is DataStatus.DELAYED
+    assert env.delay_minutes == 15
