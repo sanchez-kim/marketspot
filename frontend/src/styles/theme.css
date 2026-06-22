@@ -14,9 +14,9 @@
   --down: #ea3943;
 
   /* 밀도 변수 */
-  --row-h: 30px;
+  --row-h: 32px;
   --pad: 12px;
-  --font-sz: 14px;
+  --font-sz: 15px;
 }
 
 :root[data-upcolor="red"] {
@@ -25,14 +25,14 @@
 }
 
 :root[data-density="normal"] {
-  --row-h: 26px;
+  --row-h: 28px;
   --pad: 9px;
-  --font-sz: 13px;
+  --font-sz: 14px;
 }
 :root[data-density="compact"] {
-  --row-h: 22px;
+  --row-h: 24px;
   --pad: 6px;
-  --font-sz: 12px;
+  --font-sz: 13px;
 }
 
 * {
@@ -111,7 +111,7 @@ body {
   border: none;
   color: var(--text-faint);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
 }
 .ai-think {
   background: var(--bg-elev);
@@ -120,7 +120,7 @@ body {
   border-radius: 6px;
   padding: 3px 8px;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 12px;
 }
 .ai-think.on {
   color: var(--accent);
@@ -139,7 +139,7 @@ body {
   gap: 12px;
 }
 .ai-empty p {
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.6;
   margin: 0 0 12px;
 }
@@ -158,7 +158,7 @@ body {
 .ai-bubble {
   padding: 9px 12px;
   border-radius: 12px;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.6;
   white-space: pre-wrap;
 }
@@ -185,7 +185,7 @@ body {
   margin: 2px 0;
 }
 .ai-bubble :where(h1, h2, h3, h4, h5) {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   margin: 8px 0 4px;
   line-height: 1.4;
@@ -198,7 +198,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 4px;
   padding: 0 4px;
-  font-size: 12px;
+  font-size: 13px;
 }
 .ai-bubble pre {
   background: var(--bg, #0d1117);
@@ -222,14 +222,14 @@ body {
 }
 .ai-bubble table {
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: 13px;
 }
 .ai-bubble :where(th, td) {
   border: 1px solid var(--border);
   padding: 2px 6px;
 }
 .ai-msg-meta {
-  font-size: 11px;
+  font-size: 12px;
   margin-top: 3px;
 }
 .ai-side-input {
@@ -248,7 +248,7 @@ body {
   border-radius: 8px;
   color: var(--text);
   padding: 8px 10px;
-  font-size: 13px;
+  font-size: 14px;
   font-family: inherit;
 }
 
@@ -342,7 +342,7 @@ body {
 }
 .strip-item .label {
   color: var(--text-faint);
-  font-size: 11px;
+  font-size: 12px;
 }
 .strip-item .value {
   font-weight: 600;
@@ -452,7 +452,7 @@ body {
   border: none;
   color: var(--text-faint);
   cursor: pointer;
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1;
   padding: 0 2px 0 8px;
   opacity: 0.3; /* 평소 흐릿, 행 hover 시 또렷 */
@@ -476,7 +476,7 @@ body {
 
 /* ── 상태 뱃지 ──────────────────────────────────────────────────── */
 .status-badge {
-  font-size: 11px;
+  font-size: 12px;
   padding: 2px 7px;
   border-radius: 999px;
   border: 1px solid var(--border);
@@ -516,7 +516,7 @@ body {
   color: var(--text-dim);
   padding: 5px 10px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
 }
 .seg button.active {
   background: var(--accent);
@@ -551,7 +551,7 @@ body {
   top: 2px;
   left: 8px;
   z-index: 2;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-faint);
   pointer-events: none; /* 라벨이 차트 인터랙션을 막지 않게 */
 }
@@ -569,7 +569,7 @@ body {
   padding: 24px;
 }
 .empty-state .big {
-  font-size: 15px;
+  font-size: 16px;
   color: var(--text-dim);
 }
 .muted {
@@ -583,12 +583,12 @@ body {
 }
 .metric-row .k {
   color: var(--text-faint);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 /* ── 뉴스 ───────────────────────────────────────────────────────── */
 .ai-note {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-dim);
   background: var(--bg-elev);
   border: 1px solid var(--border);
@@ -616,17 +616,17 @@ body {
 }
 .news-meta {
   color: var(--text-faint);
-  font-size: 12px;
+  font-size: 13px;
   margin-top: 3px;
 }
 .news-kr {
   margin-top: 6px;
   color: var(--text-dim);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.5;
 }
 .sent-badge {
-  font-size: 11px;
+  font-size: 12px;
   padding: 1px 7px;
   border-radius: 999px;
   border: 1px solid var(--border);
@@ -664,7 +664,7 @@ body {
   text-decoration: underline;
 }
 .form-badge {
-  font-size: 11px;
+  font-size: 12px;
   padding: 1px 7px;
   border-radius: 999px;
   border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
@@ -674,7 +674,7 @@ body {
 }
 .filing-meta {
   color: var(--text-faint);
-  font-size: 12px;
+  font-size: 13px;
   margin-top: 3px;
   font-variant-numeric: tabular-nums;
 }
@@ -686,7 +686,7 @@ body {
 /* ── 포트폴리오 ─────────────────────────────────────────────────── */
 .pf-summary {
   font-variant-numeric: tabular-nums;
-  font-size: 13px;
+  font-size: 14px;
 }
 .pf-add {
   display: flex;
@@ -702,20 +702,20 @@ body {
   max-width: 160px;
 }
 .pf-hint {
-  font-size: 12px;
+  font-size: 13px;
   margin-bottom: 10px;
 }
 .pf-table {
   width: 100%;
   border-collapse: collapse;
   font-variant-numeric: tabular-nums;
-  font-size: 13px;
+  font-size: 14px;
 }
 .pf-table th {
   text-align: left;
   color: var(--text-faint);
   font-weight: 500;
-  font-size: 12px;
+  font-size: 13px;
   padding: 6px 10px;
   border-bottom: 1px solid var(--border);
 }
@@ -780,7 +780,7 @@ body {
 }
 .dash-handle {
   cursor: grab;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-dim);
   user-select: none;
 }
@@ -792,7 +792,7 @@ body {
   border: none;
   color: var(--text-faint);
   cursor: pointer;
-  font-size: 11px;
+  font-size: 12px;
 }
 .dash-hide:hover {
   color: var(--down);
@@ -806,7 +806,7 @@ body {
   border: 1px dashed var(--border);
   border-radius: 10px;
   padding: 10px 14px;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 /* 투자원칙 카드 */
@@ -831,7 +831,7 @@ body {
   border: none;
   color: var(--text-faint);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
 }
 .plan-edit:hover,
 .plan-cancel:hover {
@@ -848,7 +848,7 @@ body {
   color: var(--text-dim);
   border-radius: 999px;
   padding: 4px 11px;
-  font-size: 12px;
+  font-size: 13px;
 }
 .plan-rules {
   display: flex;
@@ -860,14 +860,14 @@ body {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 13px;
+  font-size: 14px;
   cursor: pointer;
 }
 .plan-monthly {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-dim);
   margin-bottom: 12px;
 }
@@ -901,7 +901,7 @@ body {
   border: none;
   color: var(--text-faint);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
 }
 .pf-card-link:hover {
   color: var(--accent);
@@ -920,17 +920,17 @@ body {
 }
 .pf-kpi .k {
   color: var(--text-faint);
-  font-size: 11px;
+  font-size: 12px;
 }
 .pf-kpi b {
-  font-size: 15px;
+  font-size: 16px;
 }
 .pf-alloc {
   display: flex;
   flex-direction: column;
   gap: 7px;
   font-variant-numeric: tabular-nums;
-  font-size: 13px;
+  font-size: 14px;
 }
 .alloc-row {
   display: flex;
@@ -965,7 +965,7 @@ body {
 }
 .pf-card-note {
   margin-top: 10px;
-  font-size: 11px;
+  font-size: 12px;
 }
 .verdict {
   display: flex;
@@ -978,7 +978,7 @@ body {
   padding: 22px 24px;
 }
 .verdict-icon {
-  font-size: 22px;
+  font-size: 24px;
   width: 38px;
   height: 38px;
   flex-shrink: 0;
@@ -989,20 +989,20 @@ body {
   background: var(--bg-elev);
 }
 .verdict-head {
-  font-size: 19px;
+  font-size: 20px;
   font-weight: 700;
   line-height: 1.4;
 }
 .verdict-sub {
   margin-top: 8px;
   color: var(--text-dim);
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.6;
 }
 .verdict-todo {
   margin-top: 14px;
   display: inline-block;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   padding: 6px 12px;
   border-radius: 999px;
@@ -1034,7 +1034,7 @@ body {
 }
 .home-pf {
   font-variant-numeric: tabular-nums;
-  font-size: 13px;
+  font-size: 14px;
   text-align: right;
 }
 
@@ -1044,7 +1044,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 16px 18px;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.6;
 }
 .dd-head {
@@ -1055,7 +1055,7 @@ body {
 }
 .dd-sym {
   font-weight: 700;
-  font-size: 15px;
+  font-size: 16px;
 }
 .dd-dd {
   color: var(--text-dim);
@@ -1070,17 +1070,17 @@ body {
 }
 .dd-stats .k {
   color: var(--text-faint);
-  font-size: 12px;
+  font-size: 13px;
 }
 .dd-note {
   margin-top: 12px;
   color: #e3a008;
-  font-size: 13px;
+  font-size: 14px;
 }
 .dd-disclaimer {
   margin-top: 12px;
   color: var(--text-faint);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 /* ── 홈 관심종목 ────────────────────────────────────────────────── */
@@ -1153,7 +1153,7 @@ body {
 }
 .hw-dd {
   flex: 1;
-  font-size: 12px;
+  font-size: 13px;
   cursor: pointer;
 }
 
@@ -1182,7 +1182,7 @@ body {
   flex-wrap: wrap;
   gap: 6px 16px;
   font-variant-numeric: tabular-nums;
-  font-size: 13px;
+  font-size: 14px;
 }
 .mood-item {
   display: inline-flex;
@@ -1190,7 +1190,7 @@ body {
 }
 .mood-note {
   margin-top: 8px;
-  font-size: 11px;
+  font-size: 12px;
 }
 .events-title {
   margin-bottom: 8px;
@@ -1200,7 +1200,7 @@ body {
   align-items: center;
   gap: 10px;
   padding: 5px 0;
-  font-size: 13px;
+  font-size: 14px;
 }
 .event-sym {
   width: 56px;
@@ -1228,7 +1228,7 @@ body {
   margin-bottom: 8px;
 }
 .learn-kicker {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--accent);
   font-weight: 600;
 }
@@ -1237,22 +1237,22 @@ body {
   border: none;
   color: var(--text-faint);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
 }
 .learn-more:hover {
   color: var(--accent);
 }
 .learn-term {
-  font-size: 15px;
+  font-size: 16px;
   margin-bottom: 4px;
 }
 .learn-body {
   color: var(--text-dim);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.6;
 }
 .hw-status {
-  font-size: 12px;
+  font-size: 13px;
   width: 64px;
   text-align: right;
   cursor: pointer;
@@ -1297,7 +1297,7 @@ body {
   padding: 8px 10px;
   cursor: pointer;
   font-variant-numeric: tabular-nums;
-  font-size: 13px;
+  font-size: 14px;
 }
 .rail-row:hover {
   background: var(--bg-elev);
@@ -1323,7 +1323,7 @@ body {
   gap: 12px;
 }
 .symbol-name {
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 700;
 }
 .watch-toggle {
@@ -1333,7 +1333,7 @@ body {
   color: var(--text-dim);
   padding: 5px 10px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
 }
 .watch-toggle:hover {
   color: var(--text);
@@ -1367,7 +1367,7 @@ body {
   font-weight: 700;
 }
 .digest-backend {
-  font-size: 11px;
+  font-size: 12px;
 }
 .digest-item {
   padding: 10px 0;
@@ -1385,7 +1385,7 @@ body {
   color: var(--text);
   text-decoration: none;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 14px;
 }
 .digest-row a:hover {
   color: var(--accent);
@@ -1394,7 +1394,7 @@ body {
 .digest-kr {
   margin-top: 5px;
   color: var(--text-dim);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.55;
 }
 .digest-tickers {
@@ -1407,7 +1407,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 6px;
   color: var(--text-dim);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   padding: 2px 8px;
   cursor: pointer;
@@ -1440,18 +1440,18 @@ body {
   flex-wrap: wrap;
 }
 .fund-name {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 700;
 }
 .fund-type {
-  font-size: 11px;
+  font-size: 12px;
   padding: 1px 7px;
   border-radius: 999px;
   border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
   color: var(--accent);
 }
 .fund-sub {
-  font-size: 13px;
+  font-size: 14px;
 }
 .fund-summary {
   background: var(--bg-panel);
@@ -1461,7 +1461,7 @@ body {
 }
 .fund-summary p {
   margin: 6px 0 0;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.6;
   color: var(--text-dim);
 }
@@ -1482,10 +1482,10 @@ body {
 }
 .fund-metric .k {
   color: var(--text-faint);
-  font-size: 12px;
+  font-size: 13px;
 }
 .fund-metric b {
-  font-size: 15px;
+  font-size: 16px;
 }
 .fund-holdings {
   background: var(--bg-panel);
@@ -1496,7 +1496,7 @@ body {
   flex-direction: column;
   gap: 7px;
   font-variant-numeric: tabular-nums;
-  font-size: 13px;
+  font-size: 14px;
 }
 .fund-hold-title {
   margin-bottom: 4px;
@@ -1518,7 +1518,7 @@ body {
   border-bottom: 1px dotted var(--text-faint);
 }
 .gloss-i {
-  font-size: 9px;
+  font-size: 10px;
   color: var(--text-faint);
   margin-left: 1px;
   cursor: help;
@@ -1567,7 +1567,7 @@ body {
 }
 .ss-name {
   color: var(--text-dim);
-  font-size: 12px;
+  font-size: 13px;
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1575,7 +1575,7 @@ body {
 }
 .ss-meta {
   color: var(--text-faint);
-  font-size: 11px;
+  font-size: 12px;
   white-space: nowrap;
 }
 .ss-empty {
@@ -1602,7 +1602,7 @@ body {
   border: none;
   color: var(--text-faint);
   cursor: pointer;
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1;
   padding: 0;
 }
@@ -1629,7 +1629,7 @@ body {
   border-radius: 999px;
   padding: 5px 12px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
 }
 .chip:hover {
   color: var(--text);
@@ -1644,7 +1644,7 @@ body {
   border-radius: 8px;
   color: var(--text);
   padding: 10px 12px;
-  font-size: 14px;
+  font-size: 15px;
   font-family: inherit;
 }
 .ai-actions {
@@ -1682,7 +1682,7 @@ body {
 }
 .ev-title {
   font-weight: 600;
-  font-size: 13px;
+  font-size: 14px;
 }
 .ev-rows {
   display: flex;
@@ -1692,14 +1692,14 @@ body {
 .ev-row {
   display: flex;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: 14px;
 }
 .ev-row span {
   color: var(--muted, #8b94a3);
 }
 .ev-note {
   margin: 4px 0 0;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted, #8b94a3);
   line-height: 1.4;
 }
@@ -1711,13 +1711,13 @@ body {
 /* per-metric 정직 단서(예: 전년 동월 데이터 부족) — 차분하게 단서만 */
 .ev-subnote {
   margin: 0;
-  font-size: 11px;
+  font-size: 12px;
   font-style: italic;
   color: var(--muted, #8b94a3);
   line-height: 1.35;
 }
 .ev-empty {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted, #8b94a3);
   padding: 8px 0;
 }
@@ -1740,7 +1740,7 @@ body {
 }
 .briefing-title {
   font-weight: 700;
-  font-size: 15px;
+  font-size: 16px;
 }
 .review-toggle {
   display: inline-flex;
@@ -1756,7 +1756,7 @@ body {
   color: var(--muted, #8b94a3);
   padding: 4px 10px;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 13px;
   cursor: pointer;
 }
 .review-toggle .rt.on {
@@ -1777,7 +1777,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted, #8b94a3);
 }
 .ai-explain {
@@ -1786,6 +1786,6 @@ body {
   color: var(--accent, #5b9dff);
   border-radius: 6px;
   padding: 5px 10px;
-  font-size: 12px;
+  font-size: 13px;
   cursor: pointer;
 }
