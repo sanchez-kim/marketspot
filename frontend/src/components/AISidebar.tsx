@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api/client";
 import type { DrawdownContext } from "../api/types";
@@ -151,7 +153,19 @@ export function AISidebar() {
         {aiMessages.map((m, i) => (
           <div key={i} className={`ai-msg ai-msg-${m.role}`}>
             <div className="ai-bubble">
-              {m.text || (m.role === "assistant" ? "생각 중…" : "")}
+              {m.text ? (
+                m.role === "assistant" ? (
+                  // 응답은 모델이 마크다운으로 내므로 렌더한다. react-markdown 은
+                  // 기본적으로 원시 HTML 을 렌더하지 않아 안전(XSS 방지).
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.text}</ReactMarkdown>
+                ) : (
+                  m.text
+                )
+              ) : m.role === "assistant" ? (
+                "생각 중…"
+              ) : (
+                ""
+              )}
             </div>
             {m.role === "assistant" && m.backend === "rule" && (
               <div className="ai-msg-meta muted">{backendLabel(m.backend)}</div>

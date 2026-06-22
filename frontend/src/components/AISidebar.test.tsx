@@ -27,6 +27,24 @@ describe("AISidebar explainer tone", () => {
   });
 });
 
+describe("AISidebar markdown rendering", () => {
+  beforeEach(() => {
+    useUIStore.setState({
+      aiOpen: true,
+      symbol: "VOO",
+      aiMessages: [{ role: "assistant", text: "**굵게** 설명\n\n- 항목1\n- 항목2" }],
+    });
+  });
+
+  it("renders assistant markdown as HTML (bold + list), not raw asterisks", () => {
+    const { container } = renderSidebar();
+    expect(container.querySelector("strong")?.textContent).toBe("굵게");
+    expect(container.querySelectorAll("li").length).toBe(2);
+    // the literal markdown syntax must not leak as visible text
+    expect(screen.queryByText(/\*\*굵게\*\*/)).not.toBeInTheDocument();
+  });
+});
+
 describe("AISidebar pending-question queue", () => {
   beforeEach(() => {
     useUIStore.setState({
