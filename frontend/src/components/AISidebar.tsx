@@ -7,7 +7,7 @@ import { useUIStore } from "../store/uiStore";
 
 const HAS_DATA = ["LIVE", "DELAYED", "STALE"];
 
-// 선제 설명자: 현재 종목의 맥락으로 *근거 설명자가 먼저 거는 말* + 설명 유도 질문을
+// 첫인사: 현재 종목의 맥락으로 *AI 도우미가 먼저 거는 말* + 이어 물어볼 만한 질문을
 // 만든다(규칙기반, 즉시·정직 — 예측·매수매도 안 함).
 function buildIntro(
   symbol: string,
@@ -25,8 +25,8 @@ function buildIntro(
   }
 
   const greeting =
-    `${symbol}의 근거(밸류·기저율·거시·포트폴리오)를 설명해 드릴게요.${ddContext} ` +
-    `예측·매수매도는 하지 않아요.`;
+    `${symbol}를 볼 때 따져볼 근거(밸류·기저율·거시·포트폴리오), 제가 하나씩 풀어드릴게요.${ddContext} ` +
+    `대신 오를지 내릴지, 사라 팔라는 말은 안 해요.`;
 
   chips.push("PER이 무슨 뜻이야?");
   chips.push("지금 과열인지 어떻게 봐?");
@@ -110,7 +110,7 @@ export function AISidebar() {
   return (
     <aside className="ai-side">
       <div className="ai-side-head">
-        <span className="ai-side-title">✦ AI 설명자</span>
+        <span className="ai-side-title">✦ AI 도우미</span>
         <div className="ai-side-actions">
           <button
             className={`ai-think ${aiThink ? "on" : ""}`}

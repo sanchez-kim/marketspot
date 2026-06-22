@@ -28,7 +28,7 @@ const SECTIONS: { id: Section; label: string }[] = [
 ];
 
 /**
- * 종목 상세 — 한 종목에 대한 모든 것: 결정 브리핑(근거 4축) + 차트 + 뉴스 + 공시.
+ * 종목 상세 — 한 종목에 대한 모든 것: 살펴보기(근거 4축) + 차트 + 뉴스 + 공시.
  * 좌측 관심종목 레일에서 바로 클릭해 전환하거나, 검색으로 다른 종목을 본다.
  */
 export function SymbolTab() {
@@ -99,10 +99,10 @@ export function SymbolTab() {
           </button>
         </div>
 
-        {/* ── 결정 브리핑 ────────────────────────────────────────── */}
+        {/* ── 살펴보기 ──────────────────────────────────────────── */}
         <div className="briefing">
           <div className="briefing-head">
-            <span className="briefing-title">결정 브리핑 · {symbol}</span>
+            <span className="briefing-title">살펴보기 · {symbol}</span>
             <div className="review-toggle" role="group" aria-label="검토 모드">
               {(
                 [
@@ -129,7 +129,7 @@ export function SymbolTab() {
             <RiskPanel data={risk.data ?? null} mode={reviewMode} />
           </div>
           <div className="briefing-foot">
-            <span>사실만 차려줌 — 판단은 당신.</span>
+            <span>여기까지가 사실, 판단은 당신 몫이에요.</span>
             <button
               className="ai-explain"
               onClick={() =>
@@ -138,7 +138,7 @@ export function SymbolTab() {
                 )
               }
             >
-              ✦ AI에게 설명 요청
+              ✦ AI에게 물어보기
             </button>
           </div>
         </div>

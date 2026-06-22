@@ -1607,7 +1607,7 @@ body {
   line-height: 1.6;
 }
 
-/* 근거 4축 패널 (결정 브리핑) */
+/* 근거 4축 패널 (살펴보기) */
 .ev-panel {
   background: var(--panel, #14181f);
   border: 1px solid var(--border, #232a35);
@@ -1655,7 +1655,7 @@ body {
   font-weight: 600;
 }
 
-/* ── 결정 브리핑 레이아웃 ───────────────────────────────────────── */
+/* ── 살펴보기 레이아웃 ──────────────────────────────────────────── */
 .briefing {
   display: flex;
   flex-direction: column;
