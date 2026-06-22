@@ -21,13 +21,16 @@ export function MacroPanel({ data }: { data: MacroConditions | null }) {
     );
   }
   const metric = (m: MacroMetric) => (
-    <div className="ev-row" key={m.label}>
-      <span>{m.label}</span>
-      <b>
-        {fmt(m)}
-        {arrow(m.change)}
-        {!HAS_DATA.has(m.status) && <DataStatusBadge status={m.status} />}
-      </b>
+    <div className="ev-metric" key={m.label}>
+      <div className="ev-row">
+        <span>{m.label}</span>
+        <b>
+          {fmt(m)}
+          {arrow(m.change)}
+          {!HAS_DATA.has(m.status) && <DataStatusBadge status={m.status} />}
+        </b>
+      </div>
+      {m.note && <p className="ev-subnote">{m.note}</p>}
     </div>
   );
   return (

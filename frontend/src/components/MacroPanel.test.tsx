@@ -46,6 +46,15 @@ describe("MacroPanel", () => {
     expect(screen.getByText(/8\.7/)).toBeInTheDocument(); // vs MA200
   });
 
+  it("surfaces a per-metric honesty note when the backend sets one", () => {
+    const withNote: MacroConditions = {
+      ...data,
+      cpi: { ...data.cpi, note: "전년 동월 데이터가 부족합니다" },
+    };
+    render(<MacroPanel data={withNote} />);
+    expect(screen.getByText("전년 동월 데이터가 부족합니다")).toBeInTheDocument();
+  });
+
   it("shows NEEDS_KEY honestly when CPI value is null with that status", () => {
     const noKey: MacroConditions = {
       ...data,

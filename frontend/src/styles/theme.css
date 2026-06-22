@@ -1645,6 +1645,19 @@ body {
   color: var(--muted, #8b94a3);
   line-height: 1.4;
 }
+.ev-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+/* per-metric 정직 단서(예: 전년 동월 데이터 부족) — 차분하게 단서만 */
+.ev-subnote {
+  margin: 0;
+  font-size: 11px;
+  font-style: italic;
+  color: var(--muted, #8b94a3);
+  line-height: 1.35;
+}
 .ev-empty {
   font-size: 12px;
   color: var(--muted, #8b94a3);
