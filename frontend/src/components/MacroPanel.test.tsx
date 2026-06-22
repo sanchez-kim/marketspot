@@ -55,6 +55,25 @@ describe("MacroPanel", () => {
     expect(screen.getByText("전년 동월 데이터가 부족합니다")).toBeInTheDocument();
   });
 
+  it("shows an honest badge for an index whose data is missing (not a silent —)", () => {
+    const badIndex: MacroConditions = {
+      ...data,
+      indices: [
+        {
+          label: "S&P 500",
+          symbol: "^GSPC",
+          price: null,
+          vsMa50Pct: null,
+          vsMa200Pct: null,
+          status: "NEEDS_KEY",
+        },
+      ],
+    };
+    render(<MacroPanel data={badIndex} />);
+    // the index row must surface its status, not render a bare "—" with no explanation
+    expect(screen.getAllByText("API 키 필요").length).toBeGreaterThan(0);
+  });
+
   it("shows NEEDS_KEY honestly when CPI value is null with that status", () => {
     const noKey: MacroConditions = {
       ...data,

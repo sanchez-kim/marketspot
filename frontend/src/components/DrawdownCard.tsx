@@ -23,7 +23,7 @@ export function DrawdownCard({ ctx }: Props) {
     );
   }
 
-  const dd = ctx.currentDrawdownPct ?? 0;
+  const dd = ctx.currentDrawdownPct;
   const allRecovered =
     ctx.comparableCount > 0 && ctx.recoveredCount === ctx.comparableCount;
 
@@ -31,7 +31,9 @@ export function DrawdownCard({ ctx }: Props) {
     <div className="dd-card">
       <div className="dd-head">
         <span className="dd-sym">{ctx.symbol}</span>
-        <span className="dd-dd">고점 대비 {dd.toFixed(1)}%</span>
+        <span className="dd-dd">
+          고점 대비 {dd == null ? "—" : `${dd.toFixed(1)}%`}
+        </span>
       </div>
 
       {ctx.limitedHistory || ctx.comparableCount === 0 ? (

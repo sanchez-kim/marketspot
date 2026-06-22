@@ -44,7 +44,10 @@ export function MacroPanel({ data }: { data: MacroConditions | null }) {
         {data.indices.map((ix) => (
           <div className="ev-row" key={ix.symbol}>
             <span>{ix.label} · 200일선</span>
-            <b>{ix.vsMa200Pct === null ? "—" : `${ix.vsMa200Pct.toFixed(1)}%`}</b>
+            <b>
+              {ix.vsMa200Pct === null ? "—" : `${ix.vsMa200Pct.toFixed(1)}%`}
+              {!HAS_DATA.has(ix.status) && <DataStatusBadge status={ix.status} />}
+            </b>
           </div>
         ))}
       </div>
