@@ -5,6 +5,12 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "../api/client";
 import type { DrawdownContext } from "../api/types";
 import { backendLabel } from "../lib/format";
+import { buildEvidenceContext } from "../lib/evidenceContext";
+import {
+  useMacroConditions,
+  usePortfolioRisk,
+  useValuation,
+} from "../hooks/useEvidence";
 import { useUIStore } from "../store/uiStore";
 
 const HAS_DATA = ["LIVE", "DELAYED", "STALE"];
@@ -65,6 +71,10 @@ export function AISidebar() {
     queryFn: () => api.context(symbol),
     enabled: aiOpen,
   });
+  // 근거 grounding — 사이드바가 열렸을 때만 현재 종목의 실값을 모은다.
+  const valuation = useValuation(symbol, aiOpen);
+  const macro = useMacroConditions(aiOpen);
+  const risk = usePortfolioRisk(aiOpen);
 
   useEffect(() => {
     bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight });
@@ -95,7 +105,16 @@ export function AISidebar() {
       .slice(-4)
       .map((m) => `${m.role === "user" ? "Q" : "A"}: ${m.text}`)
       .join("\n");
-    const context = `현재 보고 있는 종목: ${symbol}.\n${history}`;
+    // 근거 실값을 주입해 모델이 지어내지 않고 구체적으로 설명하게 한다.
+    const evidence = buildEvidenceContext(symbol, {
+      valuation: valuation.data ?? null,
+      drawdown: ctx.data ?? null,
+      macro: macro.data ?? null,
+      risk: risk.data ?? null,
+    });
+    const context = [`현재 보고 있는 종목: ${symbol}.`, evidence, history]
+      .filter(Boolean)
+      .join("\n\n");
     pushAiMessage({ role: "user", text });
     pushAiMessage({ role: "assistant", text: "" }); // 스트리밍 대상
     setSending(true);
