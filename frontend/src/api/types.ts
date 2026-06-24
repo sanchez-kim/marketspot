@@ -171,6 +171,7 @@ export interface PositionValuation {
   unrealizedPnl: number | null;
   unrealizedPnlPct: number | null;
   weight: number | null;
+  realizedPnl: number;
   status: DataStatus;
 }
 
@@ -183,6 +184,25 @@ export interface PortfolioSummary {
   valuedCount: number;
   unvaluedCount: number;
   asOf: string | null;
+  totalRealized: number;
+  valueKrw: number | null;
+  valueUsd: number | null;
+  unrealizedKrw: number | null;
+  unrealizedUsd: number | null;
+  realizedKrw: number | null;
+  realizedUsd: number | null;
+  fxRate: number | null;
+  fxStatus: DataStatus;
+}
+
+export interface Transaction {
+  id: string;
+  date: string | null;
+  type: "buy" | "sell";
+  symbol: string;
+  quantity: number;
+  price: number;
+  currency: string;
 }
 
 // ── 안심 레이어 ─────────────────────────────────────────────────────

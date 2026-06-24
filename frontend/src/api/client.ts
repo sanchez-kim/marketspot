@@ -20,6 +20,7 @@ import type {
   SettingsPatch,
   StripItem,
   SymbolMatch,
+  Transaction,
   ValuationContext,
 } from "./types";
 
@@ -46,6 +47,15 @@ async function putJSON<T>(url: string, body: unknown): Promise<T> {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
+  });
+  if (!resp.ok) throw new Error(`요청 실패 (${resp.status}): ${url}`);
+  return (await resp.json()) as T;
+}
+
+async function delJSON<T>(url: string): Promise<T> {
+  const resp = await fetch(url, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
   });
   if (!resp.ok) throw new Error(`요청 실패 (${resp.status}): ${url}`);
   return (await resp.json()) as T;
@@ -144,6 +154,19 @@ export const api = {
   portfolioRisk: () => getJSON<PortfolioRisk>("/api/portfolio/risk"),
   valuation: (symbol: string) =>
     getJSON<ValuationContext>(`/api/valuation/${encodeURIComponent(symbol)}`),
+
+  transactions: () => getJSON<Transaction[]>(`/api/portfolio/transactions`),
+
+  addTransaction: (body: {
+    type: "buy" | "sell";
+    symbol: string;
+    quantity: number;
+    price: number;
+    date: string | null;
+  }) => postJSON<PortfolioSummary>(`/api/portfolio/transactions`, body),
+
+  deleteTransaction: (id: string) =>
+    delJSON<PortfolioSummary>(`/api/portfolio/transactions/${encodeURIComponent(id)}`),
 
   settings: () => getJSON<SafeSettings>(`/api/settings`),
 
