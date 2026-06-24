@@ -2,12 +2,16 @@ from __future__ import annotations
 
 import pytest
 
-from app.analytics.holdings import currency_of, derive_holdings
+from app.analytics.holdings import (
+    combine_currency_totals,
+    currency_of,
+    derive_holdings,
+)
 from app.models import Transaction
 
 
 def _t(**kw: object) -> Transaction:
-    base = {"id": "x", "date": None, "currency": "USD"}
+    base: dict[str, object] = {"id": "x", "date": None, "currency": "USD"}
     base.update(kw)
     return Transaction.model_validate(base)
 
@@ -51,3 +55,21 @@ def test_fully_sold_symbol_drops_from_positions_but_keeps_realized() -> None:
     symbols = [h.symbol for h in result]
     assert "AAPL" not in symbols  # 수량 0 → 포지션 제외
     assert "VOO" in symbols
+
+
+def test_combine_totals_with_fx() -> None:
+    # USD 1000 + KRW 1_374_500, rate=1374.5 KRW/USD
+    out = combine_currency_totals({"USD": 1000.0, "KRW": 1_374_500.0}, fx_rate=1374.5)
+    assert out.krw == pytest.approx(1000.0 * 1374.5 + 1_374_500.0)
+    assert out.usd == pytest.approx(1000.0 + 1_374_500.0 / 1374.5)
+
+
+def test_combine_totals_without_fx_mixed_is_null() -> None:
+    out = combine_currency_totals({"USD": 1000.0, "KRW": 5000.0}, fx_rate=None)
+    assert out.krw is None and out.usd is None
+
+
+def test_combine_totals_single_currency_no_fx_ok() -> None:
+    out = combine_currency_totals({"USD": 1000.0}, fx_rate=None)
+    assert out.usd == 1000.0
+    assert out.krw is None  # 환산 불가

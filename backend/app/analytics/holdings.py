@@ -18,6 +18,29 @@ class DerivedHolding:
     currency: str
 
 
+@dataclass
+class CurrencyTotals:
+    krw: float | None
+    usd: float | None
+
+
+def combine_currency_totals(
+    by_currency: dict[str, float], *, fx_rate: float | None
+) -> CurrencyTotals:
+    """통화별 합계를 KRW/USD 양 통화로 환산. 환산 불가면 해당 통화 None."""
+    usd = by_currency.get("USD", 0.0)
+    krw = by_currency.get("KRW", 0.0)
+    has_usd = "USD" in by_currency
+    has_krw = "KRW" in by_currency
+    if fx_rate:
+        return CurrencyTotals(krw=krw + usd * fx_rate, usd=usd + krw / fx_rate)
+    # 환율 없음: 단일 통화면 그 통화만 채움
+    return CurrencyTotals(
+        krw=krw if (has_krw and not has_usd) else None,
+        usd=usd if (has_usd and not has_krw) else None,
+    )
+
+
 def currency_of(symbol: str) -> str:
     return "KRW" if market_of(symbol) == "KR" else "USD"
 
