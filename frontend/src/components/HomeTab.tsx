@@ -16,7 +16,9 @@ import {
   arrayMove,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { useQuery } from "@tanstack/react-query";
 import type { DashboardLayout } from "../api/types";
+import { api } from "../api/client";
 import { useSettings, useUpdateSettings } from "../hooks/useSettings";
 import { HomeWatchlist } from "./HomeWatchlist";
 import { HomeNews } from "./HomeNews";
@@ -28,20 +30,13 @@ import { SortableCard } from "./SortableCard";
 
 // 카드 레지스트리 — id → 라벨·요소·기본 열
 type Col = "left" | "right";
-const CARD_DEFS: { id: string; label: string; el: ReactNode; col: Col }[] = [
-  {
-    id: "portfolio",
-    label: "포트폴리오 요약",
-    el: <PortfolioSummaryCard />,
-    col: "left",
-  },
-  { id: "watchlist", label: "관심종목", el: <HomeWatchlist />, col: "left" },
-  { id: "mood", label: "시장 분위기", el: <MarketMood />, col: "right" },
-  { id: "news", label: "오늘 눈여겨볼 뉴스", el: <HomeNews />, col: "right" },
-  { id: "events", label: "다가오는 일정", el: <UpcomingEvents />, col: "right" },
-  { id: "learn", label: "오늘의 배움", el: <LearnCard />, col: "right" },
-];
-const CARD_MAP = Object.fromEntries(CARD_DEFS.map((c) => [c.id, c]));
+
+interface CardDef {
+  id: string;
+  label: string;
+  el: ReactNode;
+  col: Col;
+}
 
 interface Cols {
   left: string[];
@@ -49,16 +44,19 @@ interface Cols {
 }
 
 // 저장된 레이아웃을 레지스트리와 맞춘다(모르는 id 제거, 누락 카드는 기본 열에 추가).
-function reconcile(saved: DashboardLayout | undefined): {
+function reconcile(
+  saved: DashboardLayout | undefined,
+  cardDefs: CardDef[],
+): {
   cols: Cols;
   hidden: string[];
 } {
-  const known = new Set(CARD_DEFS.map((c) => c.id));
+  const known = new Set(cardDefs.map((c) => c.id));
   const left = (saved?.left ?? []).filter((id) => known.has(id));
   const right = (saved?.right ?? []).filter((id) => known.has(id));
   const hidden = (saved?.hidden ?? []).filter((id) => known.has(id));
   const placed = new Set([...left, ...right, ...hidden]);
-  for (const c of CARD_DEFS) {
+  for (const c of cardDefs) {
     if (!placed.has(c.id)) (c.col === "left" ? left : right).push(c.id);
   }
   return { cols: { left, right }, hidden };
@@ -69,11 +67,13 @@ function Column({
   ids,
   editMode,
   onHide,
+  cardMap,
 }: {
   id: Col;
   ids: string[];
   editMode: boolean;
   onHide: (id: string) => void;
+  cardMap: Record<string, CardDef>;
 }) {
   const { setNodeRef } = useDroppable({ id });
   return (
@@ -83,11 +83,11 @@ function Column({
           <SortableCard
             key={cid}
             id={cid}
-            label={CARD_MAP[cid].label}
+            label={cardMap[cid].label}
             editMode={editMode}
             onHide={onHide}
           >
-            {CARD_MAP[cid].el}
+            {cardMap[cid].el}
           </SortableCard>
         ))}
       </SortableContext>
@@ -98,6 +98,13 @@ function Column({
 export function HomeTab() {
   const settings = useSettings();
   const update = useUpdateSettings();
+
+  // 포트폴리오 데이터 — PortfolioSummaryCard 에 prop으로 전달
+  const pf = useQuery({
+    queryKey: ["portfolio"],
+    queryFn: api.portfolio,
+    refetchInterval: 60_000,
+  });
 
   const [cols, setCols] = useState<Cols>({ left: [], right: [] });
   const [hidden, setHidden] = useState<string[]>([]);
@@ -110,13 +117,30 @@ export function HomeTab() {
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
   );
 
+  // 카드 레지스트리 — 포트폴리오 데이터를 prop으로 주입
+  const CARD_DEFS: CardDef[] = [
+    {
+      id: "portfolio",
+      label: "포트폴리오 요약",
+      el: pf.data ? <PortfolioSummaryCard summary={pf.data} /> : null,
+      col: "left",
+    },
+    { id: "watchlist", label: "관심종목", el: <HomeWatchlist />, col: "left" },
+    { id: "mood", label: "시장 분위기", el: <MarketMood />, col: "right" },
+    { id: "news", label: "오늘 눈여겨볼 뉴스", el: <HomeNews />, col: "right" },
+    { id: "events", label: "다가오는 일정", el: <UpcomingEvents />, col: "right" },
+    { id: "learn", label: "오늘의 배움", el: <LearnCard />, col: "right" },
+  ];
+  const CARD_MAP = Object.fromEntries(CARD_DEFS.map((c) => [c.id, c]));
+
   // 저장된 레이아웃 로드(최초 1회)
   useEffect(() => {
     if (initialized.current || !settings.data) return;
-    const { cols: c, hidden: h } = reconcile(settings.data.dashboard);
+    const { cols: c, hidden: h } = reconcile(settings.data.dashboard, CARD_DEFS);
     setCols(c);
     setHidden(h);
     initialized.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings.data]);
 
   // 변경 사항 저장(드래그 중이 아닐 때만)
@@ -213,8 +237,20 @@ export function HomeTab() {
         onDragEnd={onDragEnd}
       >
         <div className="home-grid">
-          <Column id="left" ids={cols.left} editMode={editMode} onHide={hide} />
-          <Column id="right" ids={cols.right} editMode={editMode} onHide={hide} />
+          <Column
+            id="left"
+            ids={cols.left}
+            editMode={editMode}
+            onHide={hide}
+            cardMap={CARD_MAP}
+          />
+          <Column
+            id="right"
+            ids={cols.right}
+            editMode={editMode}
+            onHide={hide}
+            cardMap={CARD_MAP}
+          />
         </div>
       </DndContext>
     </div>
