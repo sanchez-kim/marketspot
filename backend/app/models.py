@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from datetime import date, datetime
 from enum import StrEnum
-from typing import Generic, TypeVar
+from typing import Generic, Literal, TypeVar
 
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
@@ -209,6 +209,18 @@ class FilingList(CamelModel):
 
 
 # ---- 포트폴리오 (수동 입력) --------------------------------------------------
+
+
+class Transaction(CamelModel):
+    """사용자 거래(체결) 기록 — 매수/매도 1건."""
+
+    id: str
+    date: str | None  # ISO YYYY-MM-DD. 마이그레이션분은 None("기초 보유")
+    type: Literal["buy", "sell"]
+    symbol: str
+    quantity: float
+    price: float  # 1주당 체결가(해당 종목 통화 기준)
+    currency: str  # "USD" | "KRW"
 
 
 class Position(CamelModel):
