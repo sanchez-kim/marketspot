@@ -45,8 +45,15 @@ def currency_of(symbol: str) -> str:
     return "KRW" if market_of(symbol) == "KR" else "USD"
 
 
-def derive_holdings(txns: Sequence[Transaction]) -> list[DerivedHolding]:
-    """종목별로 입력 순서대로 fold. 보유수량>0 인 종목만 반환(첫 등장 순서)."""
+def _fold(
+    txns: Sequence[Transaction],
+) -> tuple[list[str], dict[str, DerivedHolding]]:
+    """모든 종목(청산 포함)에 대해 이동평균 fold를 수행한다.
+
+    Returns:
+        order: 첫 등장 순서의 심볼 목록.
+        state: 심볼 → DerivedHolding (quantity==0 포함).
+    """
     state: dict[str, DerivedHolding] = {}
     order: list[str] = []
     for t in txns:
@@ -64,4 +71,23 @@ def derive_holdings(txns: Sequence[Transaction]) -> list[DerivedHolding]:
             sold = min(t.quantity, h.quantity)  # 초과분은 클램프(라우터에서 사전 거부)
             h.realized_pnl += (t.price - h.avg_cost) * sold
             h.quantity -= sold
+    return order, state
+
+
+def derive_holdings(txns: Sequence[Transaction]) -> list[DerivedHolding]:
+    """종목별로 입력 순서대로 fold. 보유수량>0 인 종목만 반환(첫 등장 순서)."""
+    order, state = _fold(txns)
     return [state[s] for s in order if state[s].quantity > 0]
+
+
+def realized_by_currency(txns: Sequence[Transaction]) -> dict[str, float]:
+    """청산·미청산 모든 종목의 realized_pnl을 통화별로 합산한다.
+
+    derive_holdings 에서 제외되는 완전 청산 포지션의 실현손익도 포함된다.
+    """
+    _, state = _fold(txns)
+    by_ccy: dict[str, float] = {}
+    for h in state.values():
+        if h.realized_pnl:
+            by_ccy[h.currency] = by_ccy.get(h.currency, 0.0) + h.realized_pnl
+    return by_ccy

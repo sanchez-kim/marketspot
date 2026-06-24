@@ -136,6 +136,30 @@ async def test_empty_portfolio() -> None:
 
 
 @pytest.mark.asyncio
+async def test_closed_position_realized_included_in_summary() -> None:
+    """청산 포지션 실현손익이 summary.total_realized / realized_usd 에 포함돼야 한다.
+
+    AAPL 5주 매수@100 → 전량 매도@120 → realized 100 USD.
+    VOO 1주 보유 중(미청산). total_realized 및 realized_usd 가 100을 포함해야 함.
+    """
+    txns = [
+        _txn(type="buy", symbol="AAPL", quantity=5, price=100),
+        _txn(type="sell", symbol="AAPL", quantity=5, price=120),  # realized 100
+        _txn(type="buy", symbol="VOO", quantity=1, price=500),
+    ]
+    summary = await _svc({"VOO": 550.0}, txns).get_summary()
+
+    # 청산된 AAPL은 포지션 목록에 없어야 함
+    symbols = [p.symbol for p in summary.positions]
+    assert "AAPL" not in symbols
+    assert "VOO" in symbols
+
+    # 실현손익 합계에 청산분(100) 포함 필수
+    assert summary.total_realized == pytest.approx(100.0)
+    assert summary.realized_usd == pytest.approx(100.0)
+
+
+@pytest.mark.asyncio
 async def test_zero_cost_basis_has_null_pct() -> None:
     """평단 0(무상 취득 등)이면 수익률 분모가 0 → null(0으로 나누지 않음)."""
     txns = [_txn(type="buy", symbol="FREE", quantity=3, price=0)]

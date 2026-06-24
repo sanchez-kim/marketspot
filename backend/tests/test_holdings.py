@@ -6,6 +6,7 @@ from app.analytics.holdings import (
     combine_currency_totals,
     currency_of,
     derive_holdings,
+    realized_by_currency,
 )
 from app.models import Transaction
 
@@ -55,6 +56,8 @@ def test_fully_sold_symbol_drops_from_positions_but_keeps_realized() -> None:
     symbols = [h.symbol for h in result]
     assert "AAPL" not in symbols  # 수량 0 → 포지션 제외
     assert "VOO" in symbols
+    # 청산된 AAPL의 실현손익은 realized_by_currency 에서 보존되어야 함
+    assert realized_by_currency(txns) == {"USD": pytest.approx(100.0)}  # 5*(120-100)
 
 
 def test_combine_totals_with_fx() -> None:

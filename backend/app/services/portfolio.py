@@ -12,7 +12,11 @@ from __future__ import annotations
 from collections.abc import Callable
 from datetime import datetime
 
-from ..analytics.holdings import combine_currency_totals, derive_holdings
+from ..analytics.holdings import (
+    combine_currency_totals,
+    derive_holdings,
+    realized_by_currency,
+)
 from ..models import (
     DataStatus,
     PortfolioSummary,
@@ -39,17 +43,20 @@ class PortfolioService:
         self._load = txns_loader
 
     async def get_summary(self) -> PortfolioSummary:
-        holdings = derive_holdings(self._load())
+        txns = self._load()
+        holdings = derive_holdings(txns)
         quotes = await self._quotes.get_quotes([h.symbol for h in holdings])
         fx = await self._fx.usd_krw()
+
+        # 청산 포지션 포함 전체 실현손익 (derive_holdings 는 open positions 만 반환)
+        real_by_ccy = realized_by_currency(txns)
+        total_realized = sum(real_by_ccy.values())
 
         valuations: list[PositionValuation] = []
         mv_by_ccy: dict[str, float] = {}
         unreal_by_ccy: dict[str, float] = {}
-        real_by_ccy: dict[str, float] = {}
         total_value = 0.0
         total_cost = 0.0
-        total_realized = 0.0
         valued = 0
         as_of: datetime | None = None
 
@@ -65,8 +72,6 @@ class PortfolioService:
                 realized_pnl=h.realized_pnl,
                 status=env.status if env else DataStatus.NO_DATA,
             )
-            total_realized += h.realized_pnl
-            real_by_ccy[h.currency] = real_by_ccy.get(h.currency, 0.0) + h.realized_pnl
             if env and env.data is not None and env.status in _HAS_PRICE:
                 price = env.data.price
                 market_value = h.quantity * price
