@@ -245,6 +245,7 @@ class PositionValuation(CamelModel):
     unrealized_pnl: float | None = None  # 평가손익 = market_value - cost_basis
     unrealized_pnl_pct: float | None = None  # 수익률(%)
     weight: float | None = None  # 비중(%) = market_value / total_value
+    realized_pnl: float = 0.0  # 실현손익(매도로 확정된 손익, 원통화)
     status: DataStatus  # 이 포지션 시세의 상태
 
 
@@ -263,6 +264,15 @@ class PortfolioSummary(CamelModel):
     valued_count: int  # 시세로 평가된 포지션 수
     unvalued_count: int  # 시세 없어 제외된 포지션 수
     as_of: datetime | None = None
+    total_realized: float = 0.0  # 실현손익 합(원통화 단순합 — 단일통화 호환)
+    value_krw: float | None = None
+    value_usd: float | None = None
+    unrealized_krw: float | None = None
+    unrealized_usd: float | None = None
+    realized_krw: float | None = None
+    realized_usd: float | None = None
+    fx_rate: float | None = None  # 1 USD 당 KRW
+    fx_status: DataStatus = DataStatus.NO_DATA
 
 
 # ---- 포트폴리오 리스크(근거 ④) ----------------------------------------------

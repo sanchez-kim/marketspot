@@ -9,7 +9,8 @@ from fastapi.testclient import TestClient
 
 from app.deps import get_portfolio_service
 from app.main import app
-from app.models import Position
+from app.models import Transaction
+from app.services.fx import FxService
 from app.services.portfolio import PortfolioService
 
 from .test_portfolio_service import FakeQuotes
@@ -17,13 +18,31 @@ from .test_portfolio_service import FakeQuotes
 
 @pytest.fixture
 def client() -> Iterator[TestClient]:
-    positions = [
-        Position(symbol="VOO", quantity=2, avg_cost=600),
-        Position(symbol="QQQM", quantity=10, avg_cost=200),
+    txns = [
+        Transaction(
+            id="1",
+            date=None,
+            type="buy",
+            symbol="VOO",
+            quantity=2,
+            price=600,
+            currency="USD",
+        ),
+        Transaction(
+            id="2",
+            date=None,
+            type="buy",
+            symbol="QQQM",
+            quantity=10,
+            price=200,
+            currency="USD",
+        ),
     ]
+    quotes = FakeQuotes({"VOO": 678.0, "QQQM": 290.0})
     svc = PortfolioService(
-        FakeQuotes({"VOO": 678.0, "QQQM": 290.0}),  # type: ignore[arg-type]
-        positions_loader=lambda: positions,
+        quotes,  # type: ignore[arg-type]
+        FxService(quotes),  # type: ignore[arg-type]
+        txns_loader=lambda: txns,
     )
     app.dependency_overrides[get_portfolio_service] = lambda: svc
     yield TestClient(app)

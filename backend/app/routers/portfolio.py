@@ -13,9 +13,12 @@ from fastapi import APIRouter, Depends
 
 from ..deps import get_portfolio_service, get_risk_service
 from ..models import PortfolioRisk, PortfolioSummary, Position
-from ..portfolio_store import save_positions
 from ..services.portfolio import PortfolioService
 from ..services.risk import RiskService
+from ..transaction_store import (
+    migrate_positions_to_transactions,
+    save_transactions,
+)
 
 router = APIRouter(prefix="/api/portfolio", tags=["portfolio"])
 
@@ -32,8 +35,10 @@ async def replace_portfolio(
     positions: list[Position],
     service: Annotated[PortfolioService, Depends(get_portfolio_service)],
 ) -> PortfolioSummary:
-    save_positions(positions)
-    return await service.value(positions)
+    # 포지션 통째 교체 = 등가의 매수 거래로 마이그레이션해 저장한 뒤 재평가.
+    # (거래 기반 모델로 일원화 — 별도 positions 저장소는 더 이상 평가에 쓰지 않음)
+    save_transactions(migrate_positions_to_transactions(positions))
+    return await service.get_summary()
 
 
 @router.get("/risk")

@@ -26,6 +26,7 @@ from .providers.yfinance_provider import YFinanceProvider
 from .services.chart import ChartService
 from .services.conditions import MacroConditionsService
 from .services.filings import FilingsService
+from .services.fx import FxService
 from .services.home import HomeService
 from .services.macro import MacroService
 from .services.news import NewsAIService
@@ -72,7 +73,7 @@ def get_news_service() -> NewsAIService:
 
 @lru_cache(maxsize=1)
 def get_portfolio_service() -> PortfolioService:
-    return PortfolioService(get_quote_service())
+    return PortfolioService(get_quote_service(), FxService(get_quote_service()))
 
 
 @lru_cache(maxsize=1)

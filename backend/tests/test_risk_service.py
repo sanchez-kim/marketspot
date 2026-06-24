@@ -4,10 +4,28 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from app.models import Bar, DataEnvelope, DataStatus, Position
+from app.analytics.holdings import currency_of
+from app.models import Bar, DataEnvelope, DataStatus, Position, Transaction
 from app.providers.registry import ProviderRegistry
+from app.services.fx import FxService
 from app.services.portfolio import PortfolioService
 from app.services.risk import RiskService
+
+
+def _txns_from_positions(positions: list[Position]) -> list[Transaction]:
+    """각 포지션을 등가의 매수 1건으로 변환(거래 기반 PortfolioService 용)."""
+    return [
+        Transaction(
+            id=str(i),
+            date=None,
+            type="buy",
+            symbol=p.symbol,
+            quantity=p.quantity,
+            price=p.avg_cost,
+            currency=currency_of(p.symbol),
+        )
+        for i, p in enumerate(positions)
+    ]
 
 
 class _BarsProvider:
@@ -72,7 +90,10 @@ def _service(
     prov = _BarsProvider(series, no_bars=no_bars)
     registry = ProviderRegistry({"US": [prov], "KR": [prov]})
     positions = [Position(symbol=s, quantity=1.0, avg_cost=1.0) for s in series]
-    portfolio = PortfolioService(_QuoteSvc(registry), lambda: positions)  # type: ignore[arg-type]  # duck-typed fake for tests
+    quotes = _QuoteSvc(registry)
+    txns = _txns_from_positions(positions)
+    # FxService over the same registry-backed fake → KRW=X 미존재 → NO_DATA(환산 없음).
+    portfolio = PortfolioService(quotes, FxService(quotes), lambda: txns)  # type: ignore[arg-type]  # duck-typed fake for tests
     return RiskService(registry, portfolio)
 
 
@@ -138,7 +159,9 @@ async def test_risk_excludes_position_with_no_quote() -> None:
         Position(symbol="FFF", quantity=1.0, avg_cost=1.0),
         Position(symbol="GGG", quantity=1.0, avg_cost=1.0),
     ]
-    portfolio = PortfolioService(_QuoteSvc(registry), lambda: positions)  # type: ignore[arg-type]
+    quotes = _QuoteSvc(registry)
+    txns = _txns_from_positions(positions)
+    portfolio = PortfolioService(quotes, FxService(quotes), lambda: txns)  # type: ignore[arg-type]
     risk = await RiskService(registry, portfolio).get_risk()
     assert "GGG" in risk.excluded
     assert "FFF" not in risk.excluded
