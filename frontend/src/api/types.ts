@@ -85,6 +85,7 @@ export interface SafeSettings {
     density: string;
     upColor: string;
     defaultPeriod: string;
+    baseCurrency?: string;
   };
   plan: Plan;
   dashboard: DashboardLayout;

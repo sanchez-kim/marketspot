@@ -9,8 +9,15 @@ import { useSettings } from "./hooks/useSettings";
 import { useUIStore } from "./store/uiStore";
 
 export default function App() {
-  const { activeTab, upColor, density, setUpColor, setDensity, setSymbol } =
-    useUIStore();
+  const {
+    activeTab,
+    upColor,
+    density,
+    setUpColor,
+    setDensity,
+    setBaseCurrency,
+    setSymbol,
+  } = useUIStore();
   const settings = useSettings();
   const hydratedSymbol = useRef(false);
 
@@ -26,7 +33,9 @@ export default function App() {
     ) {
       setDensity(ui.density);
     }
-  }, [settings.data?.ui, setUpColor, setDensity]);
+    if (ui.baseCurrency === "KRW" || ui.baseCurrency === "USD")
+      setBaseCurrency(ui.baseCurrency);
+  }, [settings.data?.ui, setUpColor, setDensity, setBaseCurrency]);
 
   // 기본 종목은 최초 1회만 반영(이후 사용자 네비게이션을 덮어쓰지 않게).
   useEffect(() => {

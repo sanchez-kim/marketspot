@@ -16,6 +16,7 @@ interface UIState {
   interval: Interval;
   upColor: "green" | "red"; // 미국식 / 한국식
   density: "comfortable" | "normal" | "compact";
+  baseCurrency: "KRW" | "USD"; // 기준 통화 — 포트폴리오 합계 표시 단위
 
   aiOpen: boolean; // AI 사이드바 표시 여부
   aiMessages: ChatMessage[]; // 연속 대화 기록(토글해도 유지)
@@ -32,6 +33,7 @@ interface UIState {
   setInterval: (i: Interval) => void;
   setUpColor: (c: "green" | "red") => void;
   setDensity: (d: "comfortable" | "normal" | "compact") => void;
+  setBaseCurrency: (c: "KRW" | "USD") => void;
   toggleAi: () => void;
   pushAiMessage: (m: ChatMessage) => void;
   appendAiChunk: (text: string) => void; // 마지막 메시지에 토큰 누적(스트리밍)
@@ -50,6 +52,7 @@ export const useUIStore = create<UIState>((set) => ({
   interval: "1D",
   upColor: "green",
   density: "comfortable",
+  baseCurrency: "USD",
 
   aiOpen: false,
   aiMessages: [],
@@ -65,6 +68,7 @@ export const useUIStore = create<UIState>((set) => ({
   setInterval: (interval) => set({ interval }),
   setUpColor: (upColor) => set({ upColor }),
   setDensity: (density) => set({ density }),
+  setBaseCurrency: (baseCurrency) => set({ baseCurrency }),
   toggleAi: () => set((s) => ({ aiOpen: !s.aiOpen })),
   pushAiMessage: (m) => set((s) => ({ aiMessages: [...s.aiMessages, m] })),
   appendAiChunk: (text) =>
