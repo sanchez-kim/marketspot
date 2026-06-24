@@ -14,7 +14,6 @@ import type {
   Period,
   PortfolioRisk,
   PortfolioSummary,
-  Position,
   Quote,
   SafeSettings,
   SettingsPatch,
@@ -39,16 +38,6 @@ async function getJSON<T>(url: string): Promise<T> {
   if (!resp.ok) {
     throw new Error(`요청 실패 (${resp.status}): ${url}`);
   }
-  return (await resp.json()) as T;
-}
-
-async function putJSON<T>(url: string, body: unknown): Promise<T> {
-  const resp = await fetch(url, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  if (!resp.ok) throw new Error(`요청 실패 (${resp.status}): ${url}`);
   return (await resp.json()) as T;
 }
 
@@ -146,9 +135,6 @@ export const api = {
     ),
 
   portfolio: () => getJSON<PortfolioSummary>(`/api/portfolio`),
-
-  updatePortfolio: (positions: Position[]) =>
-    putJSON<PortfolioSummary>(`/api/portfolio`, positions),
 
   macroConditions: () => getJSON<MacroConditions>("/api/macro/conditions"),
   portfolioRisk: () => getJSON<PortfolioRisk>("/api/portfolio/risk"),

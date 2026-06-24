@@ -734,6 +734,87 @@ body {
   color: var(--accent);
   text-decoration: underline;
 }
+/* 포지션 표 통화 배지 */
+.pf-ccy {
+  font-size: 12px;
+  color: var(--text-faint);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+
+/* ── 거래 입력 폼 / 거래내역 ──────────────────────────────────────── */
+.txn-form {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 10px 0;
+}
+.txn-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.txn-type-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  padding: 6px 14px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.txn-type-btn.active.buy {
+  background: var(--up);
+  color: #fff;
+}
+.txn-type-btn.active.sell {
+  background: var(--down);
+  color: #fff;
+}
+.txn-form .wl-input {
+  flex: 0 1 120px;
+  max-width: 130px;
+}
+.txn-price-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 1 150px;
+}
+.txn-price-wrap .wl-input {
+  flex: 1;
+}
+.txn-currency {
+  font-size: 12px;
+  white-space: nowrap;
+}
+.txn-error {
+  flex-basis: 100%;
+  color: var(--down);
+  font-size: 13px;
+}
+/* 거래내역 표 — pf-table 스타일을 상속하고 유형/날짜 색만 더한다 */
+.txn-table .txn-date {
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.txn-table .txn-type {
+  font-weight: 600;
+}
+.txn-table .txn-type.buy {
+  color: var(--up);
+}
+.txn-table .txn-type.sell {
+  color: var(--down);
+}
+.txn-table .wl-del {
+  opacity: 0.4;
+}
+.txn-table tr:hover .wl-del {
+  opacity: 1;
+}
 
 /* ── 안심 홈 ────────────────────────────────────────────────────── */
 .home {
