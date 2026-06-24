@@ -75,12 +75,12 @@ describe("PortfolioSummaryCard — USD mode", () => {
     useUIStore.setState({ baseCurrency: "USD" });
     wrap(<PortfolioSummaryCard summary={baseSummary} />);
 
-    // USD value: $500 — use exact text match on the <b> element
+    // USD value: $500 (unsigned)
     expect(screen.getByText("$500")).toBeInTheDocument();
-    // USD unrealized P&L: $100
-    expect(screen.getByText(/\$100/)).toBeInTheDocument();
-    // USD realized P&L: $50 — exact match to avoid matching $500
-    expect(screen.getByText("$50")).toBeInTheDocument();
+    // USD unrealized P&L is positive → signed with a leading "+"
+    expect(screen.getByText(/\+\$100/)).toBeInTheDocument();
+    // USD realized P&L: +$50 — signed, exact match to avoid matching $500
+    expect(screen.getByText("+$50")).toBeInTheDocument();
   });
 });
 

@@ -8,10 +8,18 @@ function num(v: number): string {
   return v.toLocaleString("ko-KR", { maximumFractionDigits: 0 });
 }
 
-/** 통화별 금액 포맷 — null이면 "—" */
-function fmtCurrency(v: number | null, currency: "KRW" | "USD"): string {
+/** 통화별 금액 포맷 — null이면 "—". signed면 손익 부호(+/−)를 기호 앞에 붙인다. */
+function fmtCurrency(
+  v: number | null,
+  currency: "KRW" | "USD",
+  signed = false,
+): string {
   if (v === null) return "—";
   const symbol = currency === "KRW" ? "₩" : "$";
+  if (signed) {
+    const sign = v > 0 ? "+" : v < 0 ? "−" : "";
+    return `${sign}${symbol}${num(Math.abs(v))}`;
+  }
   return `${symbol}${num(v)}`;
 }
 
@@ -48,13 +56,13 @@ export function PortfolioSummaryCard({ summary: s }: Props) {
 
   const unrealizedDisplay =
     baseCurrency === "KRW"
-      ? fmtCurrency(s.unrealizedKrw, "KRW")
-      : fmtCurrency(s.unrealizedUsd, "USD");
+      ? fmtCurrency(s.unrealizedKrw, "KRW", true)
+      : fmtCurrency(s.unrealizedUsd, "USD", true);
 
   const realizedDisplay =
     baseCurrency === "KRW"
-      ? fmtCurrency(s.realizedKrw, "KRW")
-      : fmtCurrency(s.realizedUsd, "USD");
+      ? fmtCurrency(s.realizedKrw, "KRW", true)
+      : fmtCurrency(s.realizedUsd, "USD", true);
 
   // fx 없을 때 보여줄 배지: 선택 통화가 KRW이고 valueKrw === null 이면 fxStatus 배지 노출
   const fxUnavailable =
@@ -97,7 +105,6 @@ export function PortfolioSummaryCard({ summary: s }: Props) {
           <span className="k">평가손익</span>
           <b className={changeClass(unrealizedNum)}>
             {unrealizedDisplay}
-            {unrealizedNum != null && unrealizedNum >= 0 ? "" : ""}
             {s.totalPnlPct !== null && ` (${formatPct(s.totalPnlPct)})`}
           </b>
           {fxUnavailable && <DataStatusBadge status={s.fxStatus} />}
