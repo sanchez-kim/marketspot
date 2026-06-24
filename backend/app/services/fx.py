@@ -20,8 +20,17 @@ class FxService:
             return DataEnvelope.ok(
                 env.data.price, source=env.source, status=env.status, as_of=env.as_of
             )
+        # DataEnvelope.empty() rejects LIVE/DELAYED (those imply data is present).
+        # If the upstream envelope carries a price-bearing status but data=None,
+        # coerce to ERROR — the data is missing, so a price status is wrong anyway.
+        raw_status = env.status if env else DataStatus.NO_DATA
+        safe_status = (
+            DataStatus.ERROR
+            if raw_status in (DataStatus.LIVE, DataStatus.DELAYED)
+            else raw_status
+        )
         return DataEnvelope[float].empty(
             source=env.source if env else "yfinance",
-            status=env.status if env else DataStatus.NO_DATA,
+            status=safe_status,
             message="환율(USD/KRW)을 가져오지 못했습니다",
         )

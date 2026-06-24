@@ -29,3 +29,21 @@ async def test_usd_krw_missing_is_no_data() -> None:
     out = await fx.usd_krw()
     assert out.status is DataStatus.NO_DATA
     assert out.data is None
+
+
+async def test_usd_krw_price_status_with_none_data_does_not_raise() -> None:
+    """Regression: envelope with data=None but a price-bearing status (e.g. LIVE)
+    must NOT cause usd_krw() to raise ValueError via DataEnvelope.empty().
+    Instead it should return a degraded envelope with data=None and a
+    non-price status (ERROR).
+    """
+    # Construct a malformed-but-plausible envelope: status=LIVE, data=None.
+    # We bypass ok()/empty() and instantiate directly because ok() requires
+    # non-None data and empty() rejects LIVE/DELAYED.
+    bad_env: DataEnvelope[Quote] = DataEnvelope[Quote](
+        status=DataStatus.LIVE, source="yf", data=None
+    )
+    fx = FxService(_FakeQuotes(bad_env))  # type: ignore[arg-type]
+    out = await fx.usd_krw()  # must not raise
+    assert out.data is None
+    assert out.status not in (DataStatus.LIVE, DataStatus.DELAYED)
