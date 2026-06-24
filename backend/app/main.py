@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import os
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -10,6 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from . import __version__
+from .portfolio_store import load_positions
 from .routers import (
     calendar,
     chart,
@@ -27,11 +30,29 @@ from .routers import (
     spark,
     valuation,
 )
+from .transaction_store import bootstrap_transactions
+
+
+def _migrate_transactions_on_startup() -> None:
+    """기존 portfolio.json → transactions.json 한 번만 마이그레이션.
+
+    transactions.json 이 없으면 portfolio.json 에서 buy 거래내역을 생성해
+    저장한다. 이미 transactions.json 이 있으면 아무것도 하지 않는다(멱등).
+    """
+    bootstrap_transactions(None, load_positions)
+
+
+@asynccontextmanager
+async def _lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    _migrate_transactions_on_startup()
+    yield
+
 
 app = FastAPI(
     title="MarketSpot API",
     version=__version__,
     description="MarketSpot — ETF 투자자를 위한 로컬 금융 리서치 터미널 백엔드",
+    lifespan=_lifespan,
 )
 
 # 로컬 개발: Vite dev 서버(4000)에서의 호출 허용
