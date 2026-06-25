@@ -53,6 +53,39 @@ function renderTab() {
   );
 }
 
+function makeEmptySummary(): PortfolioSummary {
+  return {
+    positions: [],
+    totalValue: 0,
+    totalCost: 0,
+    totalPnl: 0,
+    totalPnlPct: 0,
+    totalRealized: 0,
+    valuedCount: 0,
+    unvaluedCount: 0,
+    asOf: null,
+    valueUsd: 0,
+    valueKrw: null,
+    unrealizedUsd: 0,
+    unrealizedKrw: null,
+    realizedUsd: 0,
+    realizedKrw: null,
+    fxRate: null,
+    fxStatus: "NO_DATA",
+  };
+}
+
+function renderEmptyTab() {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  qc.setQueryData(["portfolio"], makeEmptySummary());
+  qc.setQueryData(["transactions"], []);
+  return render(
+    <QueryClientProvider client={qc}>
+      <PortfolioTab />
+    </QueryClientProvider>,
+  );
+}
+
 describe("PortfolioTab", () => {
   it("renders the position with its realized P&L", () => {
     renderTab();
@@ -74,5 +107,12 @@ describe("PortfolioTab", () => {
     expect(screen.getByText("매수")).toBeInTheDocument();
     expect(screen.getByText("매도")).toBeInTheDocument();
     expect(screen.getByText(/거래내역이 없습니다/)).toBeInTheDocument();
+  });
+
+  it("guides the user to add a first transaction when empty", () => {
+    renderEmptyTab();
+    // 포지션도 거래도 없을 때 행동 유도 문구가 나타나야 한다.
+    // "첫 거래를 기록" is only in the empty-state guidance text, not the form.
+    expect(screen.getByText(/첫 거래를 기록/)).toBeInTheDocument();
   });
 });

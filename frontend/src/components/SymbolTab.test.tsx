@@ -4,6 +4,16 @@ import { describe, expect, it } from "vitest";
 import { SymbolTab } from "./SymbolTab";
 import type { ValuationContext } from "../api/types";
 
+function renderWithEmptyWatchlist() {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  qc.setQueryData(["settings"], { watchlist: [], defaultSymbol: "VOO" });
+  return render(
+    <QueryClientProvider client={qc}>
+      <SymbolTab />
+    </QueryClientProvider>,
+  );
+}
+
 function renderWithCache() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const val: ValuationContext = {
@@ -44,5 +54,12 @@ describe("SymbolTab as Decision Briefing", () => {
     renderWithCache();
     expect(screen.getByText(/추가매수/)).toBeInTheDocument();
     expect(screen.getByText(/설명 요청|AI/)).toBeInTheDocument();
+  });
+});
+
+describe("SymbolTab watchlist rail empty state", () => {
+  it("shows search guidance when watchlist is empty", () => {
+    renderWithEmptyWatchlist();
+    expect(screen.getByText(/검색으로 종목을 추가/)).toBeInTheDocument();
   });
 });

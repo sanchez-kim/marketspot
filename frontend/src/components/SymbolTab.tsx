@@ -67,23 +67,27 @@ export function SymbolTab() {
       <aside className="symbol-rail">
         <SymbolSearch onSelect={setSymbol} placeholder="종목 검색" />
         <div className="rail-list">
-          {watchlist.map((s) => {
-            const q = quotes.data?.[s]?.data;
-            return (
-              <button
-                key={s}
-                className={`rail-row ${s === symbol ? "active" : ""}`}
-                onClick={() => setSymbol(s)}
-              >
-                <span className="rail-sym">{s}</span>
-                {q && (
-                  <span className={changeClass(q.changePct)}>
-                    {formatPct(q.changePct)}
-                  </span>
-                )}
-              </button>
-            );
-          })}
+          {watchlist.length === 0 ? (
+            <p className="muted">검색으로 종목을 추가해보세요.</p>
+          ) : (
+            watchlist.map((s) => {
+              const q = quotes.data?.[s]?.data;
+              return (
+                <button
+                  key={s}
+                  className={`rail-row ${s === symbol ? "active" : ""}`}
+                  onClick={() => setSymbol(s)}
+                >
+                  <span className="rail-sym">{s}</span>
+                  {q && (
+                    <span className={changeClass(q.changePct)}>
+                      {formatPct(q.changePct)}
+                    </span>
+                  )}
+                </button>
+              );
+            })
+          )}
         </div>
       </aside>
 

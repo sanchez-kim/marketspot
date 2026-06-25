@@ -76,8 +76,8 @@ export function PortfolioTab() {
 
         {!portfolio.isLoading && !hasPositions && !hasTxns && (
           <div className="empty-state">
-            <span className="big">보유 종목이 없습니다</span>
-            <span>아래에서 매수 거래를 추가해 포트폴리오를 시작하세요.</span>
+            <span className="big">아직 거래가 없어요.</span>
+            <span>위 &#39;매수 추가&#39;로 첫 거래를 기록해보세요.</span>
           </div>
         )}
 
