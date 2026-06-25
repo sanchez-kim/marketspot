@@ -50,6 +50,7 @@ export function TopBar() {
         ?
       </button>
       <button
+        data-tour="ai"
         className={`icon-btn ${aiOpen ? "active" : ""}`}
         title="AI 어시스턴트 열기/닫기"
         onClick={toggleAi}
