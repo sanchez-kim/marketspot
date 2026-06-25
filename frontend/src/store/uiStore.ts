@@ -43,6 +43,13 @@ interface UIState {
   askAi: (question: string) => void; // 사이드바 열고 질문 자동 전송
   clearAiPending: () => void;
   toggleExplore: () => void;
+
+  helpOpen: boolean;
+  tourOpen: boolean;
+  openHelp: () => void;
+  closeHelp: () => void;
+  startTour: () => void;
+  endTour: () => void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -90,4 +97,11 @@ export const useUIStore = create<UIState>((set) => ({
   askAi: (question) => set({ aiOpen: true, aiPending: question }),
   clearAiPending: () => set({ aiPending: null }),
   toggleExplore: () => set((s) => ({ exploreMode: !s.exploreMode })),
+
+  helpOpen: false,
+  tourOpen: false,
+  openHelp: () => set({ helpOpen: true }),
+  closeHelp: () => set({ helpOpen: false }),
+  startTour: () => set({ tourOpen: true }),
+  endTour: () => set({ tourOpen: false }),
 }));
