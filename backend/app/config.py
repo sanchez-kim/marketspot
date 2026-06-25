@@ -48,6 +48,8 @@ class UISettings(CamelModel):
     density: str = "comfortable"  # comfortable | normal | compact
     up_color: str = "green"  # green(미국식) | red(한국식)
     default_period: str = "1Y"  # 적립식 투자자 관점 중장기 기본
+    base_currency: str = "USD"  # 포트폴리오 합계 표시 통화 (USD | KRW)
+    onboarded: bool = False  # 첫 방문 투어 완료 여부
 
 
 class DashboardLayout(CamelModel):
