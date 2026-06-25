@@ -1,5 +1,5 @@
 import { APP_INTRO, AXIS_GUIDE, TAB_GUIDE } from "../lib/helpContent";
-import { GLOSSARY } from "../lib/glossary";
+import { GLOSSARY, GLOSSARY_LABELS } from "../lib/glossary";
 import { useUIStore } from "../store/uiStore";
 
 export function HelpPanel() {
@@ -68,7 +68,7 @@ export function HelpPanel() {
           <dl className="help-glossary">
             {Object.entries(GLOSSARY).map(([term, definition]) => (
               <div key={term} className="help-gloss-item">
-                <dt className="help-gloss-term">{term}</dt>
+                <dt className="help-gloss-term">{GLOSSARY_LABELS[term] ?? term}</dt>
                 <dd className="help-gloss-def">{definition}</dd>
               </div>
             ))}

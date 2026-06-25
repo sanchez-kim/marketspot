@@ -1,6 +1,6 @@
 // frontend/src/lib/glossary.test.ts
 import { describe, expect, it } from "vitest";
-import { GLOSSARY } from "./glossary";
+import { GLOSSARY, GLOSSARY_LABELS } from "./glossary";
 
 const NEW_KEYS = ["hhi", "corr", "overheat", "ma200", "baserate", "cpi", "rate"];
 const FORBIDDEN = ["오른다", "사라", "팔아라", "급등", "급락"];
@@ -15,6 +15,11 @@ describe("glossary evidence terms", () => {
   it("contains no prediction / buy-sell language", () => {
     for (const v of Object.values(GLOSSARY)) {
       for (const bad of FORBIDDEN) expect(v).not.toContain(bad);
+    }
+  });
+  it("has a human label for every glossary key (no raw codes leak to UI)", () => {
+    for (const k of Object.keys(GLOSSARY)) {
+      expect(GLOSSARY_LABELS[k], k).toBeTruthy();
     }
   });
 });

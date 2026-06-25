@@ -21,3 +21,23 @@ export const GLOSSARY: Record<string, string> = {
   cpi: "소비자물가지수(CPI). 물가가 1년 전 대비 얼마나 올랐는지. 금리·시장 분위기에 영향을 줘요.",
   rate: "기준금리. 중앙은행이 정하는 기본 금리. 높으면 예금·채권 매력↑, 자산 가격엔 부담이 될 수 있어요.",
 };
+
+// 용어 사전에 보여줄 사람용 라벨 — GLOSSARY 키를 암호 같은 코드 대신 한국어로.
+export const GLOSSARY_LABELS: Record<string, string> = {
+  per: "PER",
+  div: "배당수익률",
+  mcap: "시가총액",
+  aum: "순자산(AUM)",
+  beta: "베타",
+  w52: "52주 범위",
+  sector: "섹터",
+  category: "투자 분류",
+  holdings: "보유 구성",
+  hhi: "집중도(HHI)",
+  corr: "평균 상관",
+  overheat: "과열도",
+  ma200: "200일선",
+  baserate: "기저율",
+  cpi: "CPI",
+  rate: "기준금리",
+};
