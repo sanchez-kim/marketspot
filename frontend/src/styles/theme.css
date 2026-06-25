@@ -1954,3 +1954,142 @@ body {
   font-size: 13px;
   cursor: pointer;
 }
+
+/* ── 도움말 오버레이 ─────────────────────────────────────────────── */
+.help-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.help-card {
+  position: relative;
+  width: 520px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 22px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+  z-index: 201;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.help-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.help-card-title {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--text);
+}
+.help-close {
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  font-size: 16px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 2px 4px;
+}
+.help-close:hover {
+  color: var(--text);
+}
+.help-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.help-intro {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text-dim);
+}
+.help-section-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.help-tab-list,
+.help-axis-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.help-tab-item,
+.help-axis-item {
+  display: flex;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.help-tab-name,
+.help-axis-title {
+  font-weight: 600;
+  color: var(--text);
+  flex-shrink: 0;
+  min-width: 80px;
+}
+.help-tab-text,
+.help-axis-text {
+  color: var(--text-dim);
+}
+/* 용어 미니 사전 */
+.help-glossary {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+}
+.help-gloss-item {
+  display: flex;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.help-gloss-term {
+  font-weight: 600;
+  color: var(--accent);
+  flex-shrink: 0;
+  min-width: 64px;
+}
+.help-gloss-def {
+  color: var(--text-dim);
+  margin: 0;
+}
+.help-card-foot {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 4px;
+  flex-shrink: 0;
+}
+.help-tour-btn {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  border-radius: 6px;
+  padding: 7px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+}
+.help-tour-btn:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
