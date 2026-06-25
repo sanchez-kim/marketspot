@@ -6,8 +6,8 @@ import { APP_INTRO, TAB_GUIDE, AXIS_GUIDE } from "./helpContent";
 const FORBIDDEN = ["오른다", "사라", "팔아라"];
 
 describe("tour + help content", () => {
-  it("has 5 tour steps each with id/title/body", () => {
-    expect(TOUR_STEPS.length).toBe(5);
+  it("has 6 tour steps each with id/title/body", () => {
+    expect(TOUR_STEPS.length).toBe(6);
     for (const s of TOUR_STEPS) {
       expect(s.id && s.title && s.body).toBeTruthy();
     }

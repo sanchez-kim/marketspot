@@ -8,35 +8,42 @@ export interface TourStep {
 
 export const TOUR_STEPS: TourStep[] = [
   {
+    id: "welcome",
+    title: "MarketSpot에 오신 걸 환영해요 👋",
+    body:
+      "예측이나 매수·매도 권유 없이, 판단에 필요한 근거만 차분하게 차려주는 앱이에요. " +
+      "처음이시니 1분만 어디에 뭐가 있는지 함께 둘러볼까요? (오른쪽 아래 '건너뛰기'로 언제든 닫을 수 있어요.)",
+  },
+  {
     id: "home",
-    title: "홈",
-    body: "관심종목과 오늘 시장을 한눈에 봅니다.",
+    title: "① 홈",
+    body: "관심종목 시세와 오늘 시장 분위기를 한눈에 볼 수 있어요.",
     tab: "home",
     selector: ".pf-card, .home-grid",
   },
   {
     id: "explore",
-    title: "살펴보기",
-    body: "한 종목을 깊이 볼 땐 여기서 '근거 4축'으로 살펴봐요.",
+    title: "② 살펴보기",
+    body: "한 종목을 깊이 보고 싶을 땐 이 탭에서 '근거 4축'으로 차근차근 살펴봐요.",
     tab: "symbol",
     selector: ".sym-tabbar, nav",
   },
   {
     id: "axes",
-    title: "근거 4축",
-    body: "밸류·기저율·거시·포트폴리오 영향. 예측이 아니라 사실을 차려줍니다.",
+    title: "③ 근거 4축",
+    body: "밸류·기저율·거시·포트폴리오 영향, 이 네 가지를 봐요. 예측이 아니라 '사실'을 차려드려요.",
     tab: "symbol",
     selector: ".ev-grid",
   },
   {
     id: "ai",
-    title: "AI 도우미",
-    body: "모르는 용어나 수치는 여기서 편하게 물어보세요.",
+    title: "④ AI 도우미",
+    body: "모르는 용어나 숫자가 나오면 여기서 편하게 물어보세요. 쉬운 말로 풀어드려요.",
     selector: ".ai-toggle, [data-tour='ai']",
   },
   {
     id: "done",
-    title: "준비 끝",
-    body: "언제든 상단 '?' 버튼으로 이 안내를 다시 볼 수 있어요.",
+    title: "이제 준비됐어요 🎉",
+    body: "천천히 둘러보세요. 다시 보고 싶으면 언제든 상단 '?' 버튼을 누르면 돼요.",
   },
 ];

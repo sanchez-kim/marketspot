@@ -15,10 +15,10 @@ describe("Tour", () => {
     const onFinish = vi.fn();
     act(() => useUIStore.setState({ tourOpen: true }));
     render(<Tour onFinish={onFinish} />);
-    // first step title shows
-    expect(screen.getByText("홈")).toBeInTheDocument();
-    // click 다음 until 완료 (5 steps)
-    for (let i = 0; i < 4; i++) {
+    // first step is the welcome greeting
+    expect(screen.getByText(/환영/)).toBeInTheDocument();
+    // click 다음 until 완료 (6 steps → 5 advances)
+    for (let i = 0; i < 5; i++) {
       fireEvent.click(screen.getByRole("button", { name: /다음/ }));
     }
     fireEvent.click(screen.getByRole("button", { name: /완료/ }));
