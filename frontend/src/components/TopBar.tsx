@@ -9,7 +9,8 @@ const TABS: { id: TabId; label: string }[] = [
 ];
 
 export function TopBar() {
-  const { activeTab, setTab, upColor, setUpColor, aiOpen, toggleAi } = useUIStore();
+  const { activeTab, setTab, upColor, setUpColor, aiOpen, toggleAi, openHelp } =
+    useUIStore();
   const update = useUpdateSettings();
 
   const toggleUpColor = () => {
@@ -44,6 +45,9 @@ export function TopBar() {
         onClick={toggleUpColor}
       >
         {upColor === "green" ? "🟢 미국식" : "🔴 한국식"}
+      </button>
+      <button className="icon-btn" title="도움말 / 시작 안내" onClick={openHelp}>
+        ?
       </button>
       <button
         className={`icon-btn ${aiOpen ? "active" : ""}`}

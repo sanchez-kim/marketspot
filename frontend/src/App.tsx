@@ -5,8 +5,11 @@ import { HomeTab } from "./components/HomeTab";
 import { SymbolTab } from "./components/SymbolTab";
 import { PortfolioTab } from "./components/PortfolioTab";
 import { AISidebar } from "./components/AISidebar";
-import { useSettings } from "./hooks/useSettings";
+import { Tour } from "./components/Tour";
+import { HelpPanel } from "./components/HelpPanel";
+import { useSettings, useUpdateSettings } from "./hooks/useSettings";
 import { useUIStore } from "./store/uiStore";
+import { useAutoTour } from "./hooks/useAutoTour";
 
 export default function App() {
   const {
@@ -19,7 +22,12 @@ export default function App() {
     setSymbol,
   } = useUIStore();
   const settings = useSettings();
+  const update = useUpdateSettings();
   const hydratedSymbol = useRef(false);
+
+  const markOnboarded = () => update.mutate({ ui: { onboarded: true } });
+
+  useAutoTour(settings.data?.ui.onboarded);
 
   // 저장된 UI 설정을 런타임 스토어로 하이드레이트(새로고침해도 유지).
   useEffect(() => {
@@ -54,6 +62,8 @@ export default function App() {
 
   return (
     <div className="app">
+      <Tour onFinish={markOnboarded} />
+      <HelpPanel />
       <TopBar />
       <IndexStrip />
       <div className="app-main">
