@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { TOUR_STEPS } from "../lib/tourSteps";
+import { placeBubble } from "../lib/tourPosition";
 import { useUIStore } from "../store/uiStore";
 
 interface TourProps {
@@ -10,6 +11,8 @@ export function Tour({ onFinish }: TourProps) {
   const { tourOpen, endTour, setTab } = useUIStore();
   const [step, setStep] = useState(0);
   const s = TOUR_STEPS[step];
+  const bubbleRef = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
 
   // Switch tab when step specifies one
   useEffect(() => {
@@ -31,32 +34,40 @@ export function Tour({ onFinish }: TourProps) {
     return () => window.removeEventListener("keydown", handler);
   }, [tourOpen, endTour]);
 
+  // Position the bubble near its target, always kept on screen. Measured after
+  // render (useLayoutEffect → before paint, no flicker). No selector → centered.
+  useLayoutEffect(() => {
+    if (!tourOpen) return;
+    const sel = TOUR_STEPS[step]?.selector;
+    const bubble = bubbleRef.current;
+    if (!sel || !bubble) {
+      setPos(null);
+      return;
+    }
+    const el = document.querySelector(sel);
+    if (!el) {
+      setPos(null);
+      return;
+    }
+    const rect = el.getBoundingClientRect();
+    if (rect.width === 0 && rect.height === 0) {
+      setPos(null);
+      return;
+    }
+    setPos(
+      placeBubble(
+        rect,
+        bubble.offsetWidth,
+        bubble.offsetHeight,
+        window.innerWidth,
+        window.innerHeight,
+      ),
+    );
+  }, [tourOpen, step]);
+
   if (!tourOpen || !s) return null;
 
   const last = step === TOUR_STEPS.length - 1;
-
-  // Best-effort highlight positioning via selector
-  let bubbleStyle: React.CSSProperties = {};
-  if (s.selector) {
-    const el = document.querySelector(s.selector);
-    if (el) {
-      const rect = el.getBoundingClientRect();
-      if (rect.width > 0 || rect.height > 0) {
-        // Position bubble below the target element, horizontally centred
-        const bubbleW = 340;
-        const left = Math.min(
-          Math.max(rect.left + rect.width / 2 - bubbleW / 2, 16),
-          window.innerWidth - bubbleW - 16,
-        );
-        bubbleStyle = {
-          position: "fixed",
-          top: rect.bottom + 12,
-          left,
-          transform: "none",
-        };
-      }
-    }
-  }
 
   const finish = () => {
     endTour();
@@ -67,7 +78,15 @@ export function Tour({ onFinish }: TourProps) {
 
   return (
     <div className="tour-overlay" role="dialog" aria-label="시작 안내">
-      <div className="tour-bubble" style={bubbleStyle}>
+      <div
+        className="tour-bubble"
+        ref={bubbleRef}
+        style={
+          pos
+            ? { position: "fixed", top: pos.top, left: pos.left, transform: "none" }
+            : undefined
+        }
+      >
         <div className="tour-title">{s.title}</div>
         <p className="tour-body">{s.body}</p>
         <div className="tour-foot">

@@ -1761,7 +1761,8 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 340px;
+  width: 360px;
+  max-width: calc(100vw - 32px);
   background: var(--bg-panel);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -1778,8 +1779,9 @@ body {
 .tour-body {
   margin: 0 0 16px;
   font-size: 14px;
-  line-height: 1.65;
+  line-height: 1.7;
   color: var(--text-dim);
+  word-break: keep-all; /* 한국어 단어 단위 줄바꿈(어색한 중간 끊김 방지) */
 }
 .tour-foot {
   display: flex;
