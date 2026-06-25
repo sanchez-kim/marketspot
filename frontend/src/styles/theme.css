@@ -1970,7 +1970,7 @@ body {
   width: 680px;
   max-width: calc(100vw - 32px);
   max-height: calc(100vh - 64px);
-  overflow-y: auto;
+  overflow: hidden; /* 스크롤은 .help-body 가 담당 — 헤더/푸터 고정 */
   background: var(--bg-panel);
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -1979,7 +1979,19 @@ body {
   z-index: 201;
   display: flex;
   flex-direction: column;
+  gap: 18px;
+}
+/* 가운데 스크롤 본문 — 헤더/푸터는 카드에 고정되어 항상 보임 */
+.help-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
   gap: 22px;
+  /* 스크롤바가 패딩 안쪽에 붙도록 음수 마진으로 폭 확보 */
+  margin: 0 -30px;
+  padding: 0 30px;
 }
 /* 섹션 사이 구분선 — 정리감 */
 .help-section + .help-section {
@@ -2081,7 +2093,8 @@ body {
 .help-card-foot {
   display: flex;
   justify-content: flex-end;
-  padding-top: 4px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
   flex-shrink: 0;
 }
 .help-tour-btn {
