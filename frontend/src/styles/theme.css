@@ -1746,6 +1746,90 @@ body {
   line-height: 1.6;
 }
 
+/* ── 투어 코치마크 ──────────────────────────────────────────────── */
+.tour-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tour-bubble {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 340px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 22px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+  z-index: 201;
+}
+.tour-title {
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+.tour-body {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text-dim);
+}
+.tour-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.tour-progress {
+  font-size: 12px;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+.tour-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.tour-actions button {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+}
+.tour-actions button:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+.tour-actions button:last-child {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.tour-actions button:last-child:hover {
+  opacity: 0.88;
+}
+.tour-skip {
+  background: none !important;
+  border-color: transparent !important;
+  color: var(--text-faint) !important;
+}
+.tour-skip:hover {
+  color: var(--text-dim) !important;
+  border-color: var(--border) !important;
+}
+
 /* 근거 4축 패널 (살펴보기) */
 .ev-panel {
   background: var(--panel, #14181f);
