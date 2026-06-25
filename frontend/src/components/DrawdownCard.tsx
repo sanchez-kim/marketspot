@@ -1,4 +1,6 @@
 import type { DrawdownContext } from "../api/types";
+import { Term } from "./Term";
+import { AXIS_GUIDE } from "../lib/helpContent";
 
 function recoveryLabel(days: number | null): string {
   if (days == null) return "—";
@@ -30,7 +32,15 @@ export function DrawdownCard({ ctx }: Props) {
   return (
     <div className="dd-card">
       <div className="dd-head">
-        <span className="dd-sym">{ctx.symbol}</span>
+        <span className="dd-sym">
+          {ctx.symbol}
+          <span
+            className="gloss"
+            title={AXIS_GUIDE.find((g) => g.title === "기저율")?.text}
+          >
+            <sup className="gloss-i">ⓘ</sup>
+          </span>
+        </span>
         <span className="dd-dd">
           고점 대비 {dd == null ? "—" : `${dd.toFixed(1)}%`}
         </span>
@@ -50,7 +60,9 @@ export function DrawdownCard({ ctx }: Props) {
           했어요{ctx.comparableCount > ctx.recoveredCount && " (1건은 진행 중)"}.
           <div className="dd-stats">
             <span>
-              <span className="k">회복 소요</span>{" "}
+              <Term k="baserate">
+                <span className="k">회복 소요</span>
+              </Term>{" "}
               {recoveryLabel(ctx.medianRecoveryDays)}
               {ctx.maxRecoveryDays != null && (
                 <span className="muted">

@@ -53,4 +53,16 @@ describe("RiskPanel", () => {
     render(<RiskPanel data={empty} mode="add" />);
     expect(screen.getByText(/보유 포지션이 없습니다/)).toBeInTheDocument();
   });
+
+  it("attaches a glossary tooltip to 집중도(HHI)", () => {
+    render(<RiskPanel data={data} mode="add" />);
+    const el = screen.getByText(/집중도\(HHI\)/);
+    expect(el.closest(".gloss")).not.toBeNull();
+  });
+
+  it("attaches a glossary tooltip to 평균 상관", () => {
+    render(<RiskPanel data={data} mode="add" />);
+    const el = screen.getByText(/평균 상관/);
+    expect(el.closest(".gloss")).not.toBeNull();
+  });
 });

@@ -35,6 +35,18 @@ describe("ValuationPanel", () => {
     expect(screen.queryByText(/5년 평균 PER 26/)).not.toBeInTheDocument();
   });
 
+  it("attaches a glossary tooltip to 52주 밴드 내 위치", () => {
+    render(<ValuationPanel data={base} />);
+    const el = screen.getByText(/52주 밴드 내 위치/);
+    expect(el.closest(".gloss")).not.toBeNull();
+  });
+
+  it("attaches a glossary tooltip to 200일선 대비", () => {
+    render(<ValuationPanel data={base} />);
+    const el = screen.getByText(/200일선 대비/);
+    expect(el.closest(".gloss")).not.toBeNull();
+  });
+
   it("renders status badge and handles null data", () => {
     const { rerender } = render(<ValuationPanel data={base} />);
     expect(screen.getByText("지연")).toBeInTheDocument(); // DataStatusBadge renders Korean label for DELAYED

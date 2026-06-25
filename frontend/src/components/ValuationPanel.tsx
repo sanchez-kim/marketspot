@@ -1,5 +1,7 @@
 import type { ValuationContext } from "../api/types";
 import { DataStatusBadge } from "./DataStatusBadge";
+import { Term } from "./Term";
+import { AXIS_GUIDE } from "../lib/helpContent";
 
 const HAS_DATA = new Set(["LIVE", "DELAYED", "STALE"]);
 const num = (v: number | null, suffix = "") =>
@@ -21,24 +23,40 @@ export function ValuationPanel({ data }: { data: ValuationContext | null }) {
   return (
     <div className="ev-panel">
       <div className="ev-head">
-        <span className="ev-title">밸류·과열도</span>
+        <span className="ev-title">
+          밸류·과열도
+          <span
+            className="gloss"
+            title={AXIS_GUIDE.find((g) => g.title === "밸류·과열도")?.text}
+          >
+            <sup className="gloss-i">ⓘ</sup>
+          </span>
+        </span>
         <DataStatusBadge status={data.status} />
       </div>
       <div className="ev-rows">
         <div className="ev-row">
-          <span>현재 PER</span>
+          <span>
+            <Term k="per">현재 PER</Term>
+          </span>
           <b>{num(data.peRatio)}</b>
         </div>
         <div className="ev-row">
-          <span>배당수익률</span>
+          <span>
+            <Term k="div">배당수익률</Term>
+          </span>
           <b>{num(data.dividendYield, "%")}</b>
         </div>
         <div className="ev-row">
-          <span>52주 밴드 내 위치</span>
+          <span>
+            <Term k="overheat">52주 밴드 내 위치</Term>
+          </span>
           <b>{num(data.week52PositionPct, "%")}</b>
         </div>
         <div className="ev-row">
-          <span>200일선 대비</span>
+          <span>
+            <Term k="ma200">200일선 대비</Term>
+          </span>
           <b>{num(data.vsMa200Pct, "%")}</b>
         </div>
       </div>

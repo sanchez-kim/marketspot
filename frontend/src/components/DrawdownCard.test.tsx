@@ -30,6 +30,23 @@ describe("DrawdownCard honesty", () => {
     expect(screen.getByText(/고점 대비 -1\.5%/)).toBeInTheDocument();
   });
 
+  it("attaches a glossary tooltip to the 회복 소요 label", () => {
+    render(
+      <DrawdownCard
+        ctx={{
+          ...base,
+          comparableCount: 3,
+          recoveredCount: 3,
+          medianRecoveryDays: 60,
+          maxRecoveryDays: 120,
+          worstDrawdownPct: -25,
+        }}
+      />,
+    );
+    const el = screen.getByText(/회복 소요/);
+    expect(el.closest(".gloss")).not.toBeNull();
+  });
+
   it("does NOT fabricate '고점 대비 0.0%' when drawdown is null under a live status", () => {
     render(<DrawdownCard ctx={{ ...base, currentDrawdownPct: null }} />);
     // null drawdown must not be coerced to a confident 0.0% fact

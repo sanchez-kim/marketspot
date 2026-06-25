@@ -74,6 +74,18 @@ describe("MacroPanel", () => {
     expect(screen.getAllByText("API 키 필요").length).toBeGreaterThan(0);
   });
 
+  it("attaches a glossary tooltip to the rate label", () => {
+    render(<MacroPanel data={data} />);
+    const el = screen.getByText(/미 기준금리/);
+    expect(el.closest(".gloss")).not.toBeNull();
+  });
+
+  it("attaches a glossary tooltip to the CPI label", () => {
+    render(<MacroPanel data={data} />);
+    const el = screen.getByText(/CPI/);
+    expect(el.closest(".gloss")).not.toBeNull();
+  });
+
   it("shows NEEDS_KEY honestly when CPI value is null with that status", () => {
     const noKey: MacroConditions = {
       ...data,

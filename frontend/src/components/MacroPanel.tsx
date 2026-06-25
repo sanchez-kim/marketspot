@@ -1,5 +1,7 @@
 import type { MacroConditions, MacroMetric } from "../api/types";
 import { DataStatusBadge } from "./DataStatusBadge";
+import { Term } from "./Term";
+import { AXIS_GUIDE } from "../lib/helpContent";
 
 const HAS_DATA = new Set(["LIVE", "DELAYED", "STALE"]);
 const fmt = (m: MacroMetric) =>
@@ -20,10 +22,15 @@ export function MacroPanel({ data }: { data: MacroConditions | null }) {
       </div>
     );
   }
+  const labelEl = (m: MacroMetric) => {
+    if (m.label.includes("CPI")) return <Term k="cpi">{m.label}</Term>;
+    if (m.label.includes("금리")) return <Term k="rate">{m.label}</Term>;
+    return <>{m.label}</>;
+  };
   const metric = (m: MacroMetric) => (
     <div className="ev-metric" key={m.label}>
       <div className="ev-row">
-        <span>{m.label}</span>
+        <span>{labelEl(m)}</span>
         <b>
           {fmt(m)}
           {arrow(m.change)}
@@ -36,7 +43,15 @@ export function MacroPanel({ data }: { data: MacroConditions | null }) {
   return (
     <div className="ev-panel">
       <div className="ev-head">
-        <span className="ev-title">거시 환경</span>
+        <span className="ev-title">
+          거시 환경
+          <span
+            className="gloss"
+            title={AXIS_GUIDE.find((g) => g.title === "거시 환경")?.text}
+          >
+            <sup className="gloss-i">ⓘ</sup>
+          </span>
+        </span>
       </div>
       <div className="ev-rows">
         {metric(data.rate)}

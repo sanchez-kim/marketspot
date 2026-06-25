@@ -1,5 +1,7 @@
 import type { PortfolioRisk } from "../api/types";
 import { DataStatusBadge } from "./DataStatusBadge";
+import { Term } from "./Term";
+import { AXIS_GUIDE } from "../lib/helpContent";
 
 const HAS_DATA = new Set(["LIVE", "DELAYED", "STALE"]);
 const EMPH: Record<"add" | "hold" | "new", string> = {
@@ -30,7 +32,15 @@ export function RiskPanel({
   return (
     <div className="ev-panel">
       <div className="ev-head">
-        <span className="ev-title">포트폴리오 영향</span>
+        <span className="ev-title">
+          포트폴리오 영향
+          <span
+            className="gloss"
+            title={AXIS_GUIDE.find((g) => g.title === "포트폴리오 영향")?.text}
+          >
+            <sup className="gloss-i">ⓘ</sup>
+          </span>
+        </span>
         <DataStatusBadge status={data.status} />
       </div>
       <div className="ev-rows">
@@ -42,13 +52,17 @@ export function RiskPanel({
           </b>
         </div>
         <div className="ev-row">
-          <span>집중도(HHI)</span>
+          <span>
+            <Term k="hhi">집중도(HHI)</Term>
+          </span>
           <b>
             {data.concentrationHhi === null ? "—" : data.concentrationHhi.toFixed(2)}
           </b>
         </div>
         <div className="ev-row">
-          <span>평균 상관</span>
+          <span>
+            <Term k="corr">평균 상관</Term>
+          </span>
           <b>{data.avgCorrelation === null ? "—" : data.avgCorrelation.toFixed(2)}</b>
         </div>
         {data.excluded.length > 0 && (
