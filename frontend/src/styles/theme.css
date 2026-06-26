@@ -1750,11 +1750,29 @@ body {
 .tour-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
   z-index: 200;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+/* 대상 없는 단계(환영/마무리) — 전체를 살짝 어둡게 */
+.tour-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+/* 스포트라이트 — 대상에 강조 링 + 큰 box-shadow 로 주변만 어둡게(대상은 또렷) */
+.tour-spotlight {
+  position: fixed;
+  border-radius: 8px;
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+  transition:
+    top 0.18s ease,
+    left 0.18s ease,
+    width 0.18s ease,
+    height 0.18s ease;
 }
 .tour-bubble {
   position: fixed;

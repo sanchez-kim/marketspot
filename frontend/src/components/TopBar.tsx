@@ -31,6 +31,7 @@ export function TopBar() {
         {TABS.map((t) => (
           <button
             key={t.id}
+            data-tour={t.id === "symbol" ? "tab-explore" : undefined}
             className={`tab-btn ${activeTab === t.id ? "active" : ""}`}
             onClick={() => setTab(t.id)}
           >

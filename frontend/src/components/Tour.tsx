@@ -7,21 +7,28 @@ interface TourProps {
   onFinish: () => void;
 }
 
+interface TargetRect {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+}
+
 export function Tour({ onFinish }: TourProps) {
-  const { tourOpen, endTour, setTab } = useUIStore();
+  const { tourOpen, endTour, setTab, activeTab } = useUIStore();
   const [step, setStep] = useState(0);
   const s = TOUR_STEPS[step];
   const bubbleRef = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+  const [rect, setRect] = useState<TargetRect | null>(null);
 
-  // Switch tab when step specifies one
+  // Reset when the tour closes
   useEffect(() => {
-    if (tourOpen && s?.tab) setTab(s.tab);
-  }, [tourOpen, step, s, setTab]);
-
-  // Reset step index when tour closes
-  useEffect(() => {
-    if (!tourOpen) setStep(0);
+    if (!tourOpen) {
+      setStep(0);
+      setRect(null);
+      setPos(null);
+    }
   }, [tourOpen]);
 
   // Esc key = skip
@@ -34,50 +41,70 @@ export function Tour({ onFinish }: TourProps) {
     return () => window.removeEventListener("keydown", handler);
   }, [tourOpen, endTour]);
 
-  // Position the bubble near its target, always kept on screen. Measured after
-  // render (useLayoutEffect → before paint, no flicker). No selector → centered.
+  // Switch tab if the step needs it, then highlight the target + place the
+  // bubble (always kept on screen). Runs before paint (no flicker). Depends on
+  // activeTab so it re-runs AFTER a tab switch, when the target is in the DOM.
   useLayoutEffect(() => {
     if (!tourOpen) return;
-    const sel = TOUR_STEPS[step]?.selector;
+    const st = TOUR_STEPS[step];
+    if (!st) return;
+    if (st.tab && st.tab !== activeTab) {
+      setTab(st.tab); // effect re-runs when activeTab updates
+      return;
+    }
     const bubble = bubbleRef.current;
-    if (!sel || !bubble) {
+    const el = st.selector ? document.querySelector(st.selector) : null;
+    if (!el || !bubble) {
+      setRect(null);
       setPos(null);
       return;
     }
-    const el = document.querySelector(sel);
-    if (!el) {
+    const r = el.getBoundingClientRect();
+    if (r.width === 0 && r.height === 0) {
+      setRect(null);
       setPos(null);
       return;
     }
-    const rect = el.getBoundingClientRect();
-    if (rect.width === 0 && rect.height === 0) {
-      setPos(null);
-      return;
-    }
+    setRect({ top: r.top, left: r.left, width: r.width, height: r.height });
     setPos(
       placeBubble(
-        rect,
+        { top: r.top, bottom: r.bottom, left: r.left, width: r.width },
         bubble.offsetWidth,
         bubble.offsetHeight,
         window.innerWidth,
         window.innerHeight,
       ),
     );
-  }, [tourOpen, step]);
+  }, [tourOpen, step, activeTab, setTab]);
 
   if (!tourOpen || !s) return null;
 
   const last = step === TOUR_STEPS.length - 1;
-
   const finish = () => {
     endTour();
     onFinish();
   };
-
   const skip = () => endTour();
+
+  const PAD = 6;
 
   return (
     <div className="tour-overlay" role="dialog" aria-label="시작 안내">
+      {rect ? (
+        // 스포트라이트: 대상에 링 + 큰 box-shadow 로 주변만 어둡게(대상은 또렷).
+        <div
+          className="tour-spotlight"
+          style={{
+            top: rect.top - PAD,
+            left: rect.left - PAD,
+            width: rect.width + PAD * 2,
+            height: rect.height + PAD * 2,
+          }}
+        />
+      ) : (
+        // 대상이 없는 단계(환영/마무리)는 전체를 살짝 어둡게.
+        <div className="tour-dim" />
+      )}
       <div
         className="tour-bubble"
         ref={bubbleRef}

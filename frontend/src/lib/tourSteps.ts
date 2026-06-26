@@ -17,16 +17,16 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "home",
     title: "① 홈",
-    body: "관심종목 시세와 오늘 시장 분위기를 한눈에 볼 수 있어요.",
+    body: "내 포트폴리오·관심종목·오늘 시장을 여기 홈에서 한눈에 봐요.",
     tab: "home",
-    selector: ".pf-card, .home-grid",
+    selector: ".pf-card",
   },
   {
     id: "explore",
     title: "② 살펴보기",
-    body: "한 종목을 깊이 보고 싶을 땐 이 탭에서 '근거 4축'으로 차근차근 살펴봐요.",
+    body: "한 종목을 깊이 보고 싶을 땐 이 '살펴보기' 탭에서 '근거 4축'으로 차근차근 살펴봐요.",
     tab: "symbol",
-    selector: ".sym-tabbar, nav",
+    selector: "[data-tour='tab-explore']",
   },
   {
     id: "axes",
