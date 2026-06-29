@@ -2238,3 +2238,51 @@ body {
   opacity: 0.5;
   cursor: default;
 }
+
+/* 인라인 텍스트 링크 버튼(예: 패널 안내에서 ⚙ 설정 열기) */
+.link-inline {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline;
+}
+.ev-needskey {
+  color: var(--text-dim);
+}
+/* 홈 포트폴리오 빈 상태 CTA */
+.pf-card-empty .pf-empty-msg {
+  margin: 8px 0 14px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-dim);
+  word-break: keep-all;
+}
+.pf-empty-cta {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+}
+.pf-empty-cta:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+/* AI 제한모드(규칙기반) 안내 배너 */
+.ai-limited {
+  margin: 0;
+  padding: 8px 14px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-dim);
+  background: var(--bg-elev);
+  border-bottom: 1px solid var(--border);
+  word-break: keep-all;
+}

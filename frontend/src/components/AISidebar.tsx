@@ -130,6 +130,11 @@ export function AISidebar() {
     }
   };
 
+  // 최근 답변이 규칙기반이면 Ollama 미연결 → 차분히 한 줄로 알린다.
+  const limitedMode =
+    [...aiMessages].reverse().find((m) => m.role === "assistant" && m.backend)
+      ?.backend === "rule";
+
   return (
     <aside className="ai-side">
       <div className="ai-side-head">
@@ -152,6 +157,13 @@ export function AISidebar() {
           </button>
         </div>
       </div>
+
+      {limitedMode && (
+        <div className="ai-limited">
+          Ollama 미연결 — 규칙 기반으로 동작 중이에요. 더 자세한 답변은 로컬 Ollama가
+          필요해요.
+        </div>
+      )}
 
       <div className="ai-side-body" ref={bodyRef}>
         {aiMessages.length === 0 && (
