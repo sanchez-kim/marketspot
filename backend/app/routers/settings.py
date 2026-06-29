@@ -5,6 +5,7 @@ from __future__ import annotations
 from fastapi import APIRouter
 
 from ..config import SafeSettings, Settings, load_settings, save_settings, to_safe
+from ..deps import reset_service_caches
 from ..models import CamelModel
 
 router = APIRouter(prefix="/api/settings", tags=["settings"])
@@ -53,4 +54,6 @@ async def update_settings(update: SettingsUpdate) -> SafeSettings:
 
     new_settings = Settings.model_validate(data)
     save_settings(new_settings)
+    # 키를 캡처한 서비스 캐시를 비워 새 API 키가 즉시 반영되게 한다(재시작 불필요).
+    reset_service_caches()
     return to_safe(new_settings)
