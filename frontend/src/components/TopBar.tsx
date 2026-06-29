@@ -9,8 +9,16 @@ const TABS: { id: TabId; label: string }[] = [
 ];
 
 export function TopBar() {
-  const { activeTab, setTab, upColor, setUpColor, aiOpen, toggleAi, openHelp } =
-    useUIStore();
+  const {
+    activeTab,
+    setTab,
+    upColor,
+    setUpColor,
+    aiOpen,
+    toggleAi,
+    openHelp,
+    openSettings,
+  } = useUIStore();
   const update = useUpdateSettings();
 
   const toggleUpColor = () => {
@@ -46,6 +54,9 @@ export function TopBar() {
         onClick={toggleUpColor}
       >
         {upColor === "green" ? "🟢 미국식" : "🔴 한국식"}
+      </button>
+      <button className="icon-btn" title="설정 (API 키)" onClick={openSettings}>
+        ⚙
       </button>
       <button className="icon-btn" title="도움말 / 시작 안내" onClick={openHelp}>
         ?

@@ -7,6 +7,7 @@ import { PortfolioTab } from "./components/PortfolioTab";
 import { AISidebar } from "./components/AISidebar";
 import { Tour } from "./components/Tour";
 import { HelpPanel } from "./components/HelpPanel";
+import { SettingsPanel } from "./components/SettingsPanel";
 import { useSettings, useUpdateSettings } from "./hooks/useSettings";
 import { useUIStore } from "./store/uiStore";
 import { useAutoTour } from "./hooks/useAutoTour";
@@ -64,6 +65,7 @@ export default function App() {
     <div className="app">
       <Tour onFinish={markOnboarded} />
       <HelpPanel />
+      <SettingsPanel />
       <TopBar />
       <IndexStrip />
       <div className="app-main">

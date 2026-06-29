@@ -50,6 +50,10 @@ interface UIState {
   closeHelp: () => void;
   startTour: () => void;
   endTour: () => void;
+
+  settingsOpen: boolean;
+  openSettings: () => void;
+  closeSettings: () => void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -104,4 +108,8 @@ export const useUIStore = create<UIState>((set) => ({
   closeHelp: () => set({ helpOpen: false }),
   startTour: () => set({ tourOpen: true }),
   endTour: () => set({ tourOpen: false }),
+
+  settingsOpen: false,
+  openSettings: () => set({ settingsOpen: true }),
+  closeSettings: () => set({ settingsOpen: false }),
 }));
