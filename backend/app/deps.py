@@ -140,3 +140,16 @@ def get_conditions_service() -> MacroConditionsService:
 @lru_cache(maxsize=1)
 def get_valuation_service() -> ValuationService:
     return ValuationService(get_fundamentals_provider(), get_registry())
+
+
+def reset_service_caches() -> None:
+    """설정(특히 API 키) 변경 후 키를 캡처해 둔 서비스 캐시를 비운다.
+
+    이 서비스들은 생성 시 FRED/DART 키를 한 번 읽어 보관하므로, 키가 바뀌면
+    캐시를 비워 다음 요청에서 새 키로 다시 만들어지게 한다(재시작 불필요).
+
+    주의: 앞으로 키를 생성 시점에 캡처하는 @lru_cache 팩토리를 추가하면
+    반드시 여기에도 cache_clear()를 추가해야 "재시작 없이 적용" 보장이 유지된다.
+    """
+    get_conditions_service.cache_clear()
+    get_filings_service.cache_clear()

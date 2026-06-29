@@ -96,4 +96,14 @@ describe("MacroPanel", () => {
     // null value → must not fabricate a CPI number
     expect(screen.queryByText(/CPI.*4\.2/)).not.toBeInTheDocument();
   });
+
+  it("shows an actionable settings hint when a metric needs an API key", () => {
+    const noKey: MacroConditions = {
+      ...data,
+      cpi: { ...data.cpi, value: null, status: "NEEDS_KEY", note: null },
+    };
+    render(<MacroPanel data={noKey} />);
+    expect(screen.getByText(/API 키를 입력하면/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /설정/ })).toBeInTheDocument();
+  });
 });

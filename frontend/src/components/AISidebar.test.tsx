@@ -25,6 +25,19 @@ describe("AISidebar explainer tone", () => {
     expect(screen.getAllByText(/근거|설명/).length).toBeGreaterThan(0);
     expect(screen.queryByText(/아무것도 하지|그냥 두세요/)).not.toBeInTheDocument();
   });
+
+  it("shows a limited-mode banner when the latest answer is rule-based (Ollama 미연결)", () => {
+    useUIStore.setState({
+      aiOpen: true,
+      symbol: "VOO",
+      aiMessages: [
+        { role: "user", text: "PER이 뭐야?" },
+        { role: "assistant", text: "주가수익비율…", backend: "rule" },
+      ],
+    });
+    renderSidebar();
+    expect(screen.getByText(/규칙 기반으로 동작 중/)).toBeInTheDocument();
+  });
 });
 
 describe("AISidebar markdown rendering", () => {

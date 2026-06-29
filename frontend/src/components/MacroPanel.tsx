@@ -2,6 +2,7 @@ import type { MacroConditions, MacroMetric } from "../api/types";
 import { DataStatusBadge } from "./DataStatusBadge";
 import { Term } from "./Term";
 import { AXIS_GUIDE } from "../lib/helpContent";
+import { useUIStore } from "../store/uiStore";
 
 const HAS_DATA = new Set(["LIVE", "DELAYED", "STALE"]);
 const fmt = (m: MacroMetric) =>
@@ -12,6 +13,7 @@ const arrow = (c: number | null) => (c === null || c === 0 ? "" : c > 0 ? " ↑"
 
 /** 근거 ③ 거시 환경 — 발표값·방향·이동평균선 대비. 예측 없음. */
 export function MacroPanel({ data }: { data: MacroConditions | null }) {
+  const openSettings = useUIStore((s) => s.openSettings);
   if (!data) {
     return (
       <div className="ev-panel">
@@ -66,6 +68,15 @@ export function MacroPanel({ data }: { data: MacroConditions | null }) {
           </div>
         ))}
       </div>
+      {(data.rate.status === "NEEDS_KEY" || data.cpi.status === "NEEDS_KEY") && (
+        <p className="ev-note ev-needskey">
+          금리·물가(FRED)는{" "}
+          <button className="link-inline" onClick={openSettings}>
+            ⚙ 설정
+          </button>
+          에서 무료 API 키를 입력하면 보여요.
+        </p>
+      )}
       <p className="ev-note">
         금리·물가·지수의 방향까지만 — "그래서 오른다"는 예측은 하지 않음.
       </p>

@@ -50,6 +50,10 @@ interface UIState {
   closeHelp: () => void;
   startTour: () => void;
   endTour: () => void;
+
+  settingsOpen: boolean;
+  openSettings: () => void;
+  closeSettings: () => void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -89,7 +93,10 @@ export const useUIStore = create<UIState>((set) => ({
     set((s) => {
       const msgs = s.aiMessages.slice();
       const last = msgs[msgs.length - 1];
-      if (last) msgs[msgs.length - 1] = { ...last, backend };
+      // assistant 메시지에만 backend를 단다 — 한정모드 배너가 엉뚱한
+      // 메시지로 오작동하지 않도록(현재는 항상 마지막이 assistant지만 방어).
+      if (last && last.role === "assistant")
+        msgs[msgs.length - 1] = { ...last, backend };
       return { aiMessages: msgs };
     }),
   clearAi: () => set({ aiMessages: [] }),
@@ -104,4 +111,8 @@ export const useUIStore = create<UIState>((set) => ({
   closeHelp: () => set({ helpOpen: false }),
   startTour: () => set({ tourOpen: true }),
   endTour: () => set({ tourOpen: false }),
+
+  settingsOpen: false,
+  openSettings: () => set({ settingsOpen: true }),
+  closeSettings: () => set({ settingsOpen: false }),
 }));

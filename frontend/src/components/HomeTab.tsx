@@ -23,6 +23,7 @@ import { useSettings, useUpdateSettings } from "../hooks/useSettings";
 import { HomeWatchlist } from "./HomeWatchlist";
 import { HomeNews } from "./HomeNews";
 import { PortfolioSummaryCard } from "./PortfolioSummaryCard";
+import { EmptyPortfolioCta } from "./EmptyPortfolioCta";
 import { MarketMood } from "./MarketMood";
 import { UpcomingEvents } from "./UpcomingEvents";
 import { LearnCard } from "./LearnCard";
@@ -122,7 +123,12 @@ export function HomeTab() {
     {
       id: "portfolio",
       label: "포트폴리오 요약",
-      el: pf.data ? <PortfolioSummaryCard summary={pf.data} /> : null,
+      el:
+        pf.data && pf.data.positions.length > 0 ? (
+          <PortfolioSummaryCard summary={pf.data} />
+        ) : (
+          <EmptyPortfolioCta />
+        ),
       col: "left",
     },
     { id: "watchlist", label: "관심종목", el: <HomeWatchlist />, col: "left" },
