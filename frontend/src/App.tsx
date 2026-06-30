@@ -8,9 +8,11 @@ import { AISidebar } from "./components/AISidebar";
 import { Tour } from "./components/Tour";
 import { HelpPanel } from "./components/HelpPanel";
 import { SettingsPanel } from "./components/SettingsPanel";
+import { BottomNav } from "./components/BottomNav";
 import { useSettings, useUpdateSettings } from "./hooks/useSettings";
 import { useUIStore } from "./store/uiStore";
 import { useAutoTour } from "./hooks/useAutoTour";
+import { useIsMobile } from "./hooks/useIsMobile";
 
 export default function App() {
   const {
@@ -29,6 +31,7 @@ export default function App() {
   const markOnboarded = () => update.mutate({ ui: { onboarded: true } });
 
   useAutoTour(settings.data?.ui.onboarded);
+  const isMobile = useIsMobile();
 
   // 저장된 UI 설정을 런타임 스토어로 하이드레이트(새로고침해도 유지).
   useEffect(() => {
@@ -76,6 +79,7 @@ export default function App() {
         </div>
         <AISidebar />
       </div>
+      {isMobile && <BottomNav />}
     </div>
   );
 }

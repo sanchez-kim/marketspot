@@ -2301,4 +2301,48 @@ body {
   .symbol {
     padding: 10px;
   }
+  /* 셸을 세로로: 본문 위, 하단 탭바 아래 */
+  .app-main {
+    flex-direction: column;
+  }
+  .app-body {
+    /* 하단 탭바(56px)에 콘텐츠가 가려지지 않게 */
+    padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+  }
+  /* 상단 탭은 하단 탭바로 이동 → TopBar 에서는 숨김 */
+  .topbar nav {
+    display: none;
+  }
+  /* 하단 고정 탭바 */
+  .bottom-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 150;
+    display: flex;
+    background: var(--bg-panel);
+    border-top: 1px solid var(--border);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .bn-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 0;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .bn-item.active {
+    color: var(--accent);
+  }
+  .bn-icon {
+    font-size: 18px;
+    line-height: 1;
+  }
 }
