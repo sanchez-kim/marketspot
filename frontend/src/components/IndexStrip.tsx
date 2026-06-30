@@ -31,6 +31,12 @@ export function IndexStrip() {
             {q ? (
               <span className={`value ${changeClass(q.changePct)}`}>
                 {formatPrice(q.price)} {formatPct(q.changePct)}
+                {item.quote.status === "STALE" && (
+                  <DataStatusBadge
+                    status={item.quote.status}
+                    source={item.quote.source}
+                  />
+                )}
               </span>
             ) : (
               <span className="value">

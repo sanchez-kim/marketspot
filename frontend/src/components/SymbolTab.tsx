@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api/client";
 import { changeClass, formatPct } from "../lib/format";
+import { DataStatusBadge } from "./DataStatusBadge";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { useSettings, useUpdateSettings } from "../hooks/useSettings";
 import { useUIStore } from "../store/uiStore";
@@ -75,7 +76,8 @@ export function SymbolTab() {
           {watchlist.length > 0 && (
             <div className="chip-row">
               {watchlist.map((s) => {
-                const q = quotes.data?.[s]?.data;
+                const env = quotes.data?.[s];
+                const q = env?.data;
                 return (
                   <button
                     key={s}
@@ -83,11 +85,14 @@ export function SymbolTab() {
                     onClick={() => setSymbol(s)}
                   >
                     <span className="wl-chip-sym">{s}</span>
-                    {q && (
-                      <span className={changeClass(q.changePct)}>
-                        {formatPct(q.changePct)}
-                      </span>
-                    )}
+                    {q &&
+                      (env?.status === "STALE" ? (
+                        <DataStatusBadge status="STALE" source={env.source} />
+                      ) : (
+                        <span className={changeClass(q.changePct)}>
+                          {formatPct(q.changePct)}
+                        </span>
+                      ))}
                   </button>
                 );
               })}
@@ -102,7 +107,8 @@ export function SymbolTab() {
               <p className="muted">검색으로 종목을 추가해보세요.</p>
             ) : (
               watchlist.map((s) => {
-                const q = quotes.data?.[s]?.data;
+                const env = quotes.data?.[s];
+                const q = env?.data;
                 return (
                   <button
                     key={s}
@@ -110,11 +116,14 @@ export function SymbolTab() {
                     onClick={() => setSymbol(s)}
                   >
                     <span className="rail-sym">{s}</span>
-                    {q && (
-                      <span className={changeClass(q.changePct)}>
-                        {formatPct(q.changePct)}
-                      </span>
-                    )}
+                    {q &&
+                      (env?.status === "STALE" ? (
+                        <DataStatusBadge status="STALE" source={env.source} />
+                      ) : (
+                        <span className={changeClass(q.changePct)}>
+                          {formatPct(q.changePct)}
+                        </span>
+                      ))}
                   </button>
                 );
               })

@@ -2439,3 +2439,15 @@ body {
     white-space: nowrap;
   }
 }
+
+/* ── STALE 시세 표시 (§0 정직성: 갱신지연 데이터는 실시간처럼 보이지 않는다) ── */
+.quote-stale {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.q-age {
+  font-size: 0.75em;
+  color: var(--text-faint);
+}
