@@ -2388,4 +2388,56 @@ body {
     border-color: var(--accent);
     color: var(--accent);
   }
+
+  /* 포트폴리오: 표 대신 종목 카드 */
+  .pos-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .pos-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-elev);
+    padding: 12px;
+  }
+  .pos-card-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .pos-sym {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 16px;
+    font-weight: 600;
+    padding: 0;
+    cursor: pointer;
+  }
+  .pos-mv {
+    font-size: 16px;
+    font-variant-numeric: tabular-nums;
+  }
+  .pos-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    row-gap: 6px;
+    column-gap: 12px;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+  .pos-k {
+    color: var(--text-dim);
+  }
+  .pos-v {
+    text-align: right;
+  }
+  /* 거래내역 표는 카드화 대신 가로 스크롤로 오버플로 방지 */
+  .txn-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
 }
