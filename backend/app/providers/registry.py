@@ -3,15 +3,21 @@
 시장(US/KR)에 따라 제공자 체인을 고르고, 앞에서부터 시도해 **실제로 데이터가
 있는** 첫 응답을 반환한다. 모두 실패하면 사용자가 행동할 수 있는(NEEDS_KEY 등)
 상태를 우선해 정직하게 보고한다.
+
+last-good 폴백: ERROR/RATE_LIMITED 일시 실패 시 직전 정상값을 STALE 로 제공.
+NO_DATA(상장폐지 신호)·NEEDS_KEY(조치 가능 신호)는 폴백하지 않고 그대로 전파
+한다(§0 정직성).
 """
 
 from __future__ import annotations
 
+import time
 from collections.abc import Awaitable, Callable
 from typing import TypeVar
 
 from ..models import Bar, DataEnvelope, DataStatus, Quote
 from .base import QuoteProvider, market_of
+from .last_good import LastGoodStore, StoreKey
 
 T = TypeVar("T")
 
@@ -26,21 +32,60 @@ _FALLBACK_PRIORITY = [
     DataStatus.NO_DATA,
 ]
 
+# 일시 실패일 때만 last-good 폴백. NO_DATA(없음/상장폐지)·NEEDS_KEY(조치 가능)는
+# 절대 덮지 않고 그대로 전파한다(§0 정직성).
+_STALE_ELIGIBLE = {DataStatus.ERROR, DataStatus.RATE_LIMITED}
+
+QUOTE_MAX_STALE_S = 24 * 3600.0
+
+
+def _bars_max_stale_s(interval: str) -> float:
+    iv = interval.upper()
+    if iv == "1D":
+        return 7 * 24 * 3600.0
+    if iv in ("1W", "1M"):
+        return 30 * 24 * 3600.0
+    return 7 * 24 * 3600.0
+
 
 class ProviderRegistry:
-    def __init__(self, chains: dict[str, list[QuoteProvider]]) -> None:
+    def __init__(
+        self,
+        chains: dict[str, list[QuoteProvider]],
+        *,
+        store: LastGoodStore | None = None,
+        clock: Callable[[], float] = time.monotonic,
+    ) -> None:
         self._chains = chains
+        self._store = store if store is not None else LastGoodStore()
+        self._clock = clock
 
     def chain_for(self, symbol: str) -> list[QuoteProvider]:
         return self._chains.get(market_of(symbol), [])
 
     async def get_quote(self, symbol: str) -> DataEnvelope[Quote]:
-        return await self._run(symbol, lambda p: p.get_quote(symbol))
+        env = await self._run(symbol, lambda p: p.get_quote(symbol))
+        return self._apply_last_good(("quote", symbol.upper()), env, QUOTE_MAX_STALE_S)
 
     async def get_bars(
         self, symbol: str, period: str, interval: str
     ) -> DataEnvelope[list[Bar]]:
-        return await self._run(symbol, lambda p: p.get_bars(symbol, period, interval))
+        env = await self._run(symbol, lambda p: p.get_bars(symbol, period, interval))
+        key: StoreKey = ("bars", symbol.upper(), period.upper(), interval.upper())
+        return self._apply_last_good(key, env, _bars_max_stale_s(interval))
+
+    def _apply_last_good(
+        self, key: StoreKey, env: DataEnvelope[T], max_age_s: float
+    ) -> DataEnvelope[T]:
+        now = self._clock()
+        if env.status in _HAS_DATA and env.data is not None:
+            self._store.remember(key, env, now)
+            return env
+        if env.status in _STALE_ELIGIBLE:
+            served = self._store.serve_stale(key, now, max_age_s)
+            if served is not None:
+                return served
+        return env
 
     async def _run(
         self,

@@ -19,6 +19,7 @@ from .providers.filings_provider import (
     SecEdgarProvider,
 )
 from .providers.fundamentals_provider import YFinanceFundamentalsProvider
+from .providers.last_good import LastGoodStore
 from .providers.macro_provider import FredMacroProvider
 from .providers.registry import ProviderRegistry
 from .providers.search_provider import SearchProvider, YahooSearchProvider
@@ -43,7 +44,10 @@ def build_registry() -> ProviderRegistry:
     # MVP: 미국/한국 모두 yfinance 기본. KIS/Alpaca 는 키 연동 시 앞단에 추가.
     us_chain: list[QuoteProvider] = [yf]
     kr_chain: list[QuoteProvider] = [yf]
-    return ProviderRegistry({"US": us_chain, "KR": kr_chain})
+    # last-good 폴백: 일시 실패 시 마지막 정상값을 STALE 로 제공(메모리 상한).
+    return ProviderRegistry(
+        {"US": us_chain, "KR": kr_chain}, store=LastGoodStore(max_entries=256)
+    )
 
 
 @lru_cache(maxsize=1)
