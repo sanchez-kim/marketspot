@@ -70,6 +70,12 @@ describe("SymbolTab watchlist rail empty state", () => {
     renderWithEmptyWatchlist();
     expect(screen.getByText(/검색으로 종목을 추가/)).toBeInTheDocument();
   });
+
+  it("shows search guidance on mobile when watchlist is empty", () => {
+    vi.mocked(useIsMobile).mockReturnValue(true);
+    renderWithEmptyWatchlist();
+    expect(screen.getByText(/검색으로 종목을 추가/)).toBeInTheDocument();
+  });
 });
 
 describe("SymbolTab responsive watchlist", () => {

@@ -69,6 +69,9 @@ export function SymbolTab() {
       {isMobile ? (
         <div className="rail-chips">
           <SymbolSearch onSelect={setSymbol} placeholder="종목 검색" />
+          {watchlist.length === 0 && (
+            <p className="muted">검색으로 종목을 추가해보세요.</p>
+          )}
           {watchlist.length > 0 && (
             <div className="chip-row">
               {watchlist.map((s) => {
