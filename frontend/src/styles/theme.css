@@ -2298,8 +2298,10 @@ body {
   .home {
     padding: 12px;
   }
+  /* 살펴보기: 좌우 여백 축소 + 가로 flex→세로(관심종목은 가로 칩 스트립) */
   .symbol {
     padding: 10px;
+    flex-direction: column;
   }
   /* 셸을 세로로: 본문 위, 하단 탭바 아래 */
   .app-main {
@@ -2355,10 +2357,6 @@ body {
     line-height: 1;
   }
 
-  /* 살펴보기: 가로 flex → 세로. 관심종목은 가로 칩 스트립 */
-  .symbol {
-    flex-direction: column;
-  }
   .rail-chips {
     display: flex;
     flex-direction: column;
