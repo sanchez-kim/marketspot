@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import type { PortfolioSummary } from "../api/types";
+import type { PortfolioSummary, PositionValuation } from "../api/types";
 import { useUIStore } from "../store/uiStore";
 import { PortfolioSummaryCard } from "./PortfolioSummaryCard";
 
@@ -114,5 +114,55 @@ describe("PortfolioSummaryCard — fx unavailable", () => {
     // Multiple fx error badges are shown (one per null KPI) — check at least one
     const badges = screen.getAllByText("오류");
     expect(badges.length).toBeGreaterThan(0);
+  });
+});
+
+// ── fixture helpers for stale-note tests ──────────────────────────────────
+
+function pos(
+  overrides: Partial<PositionValuation> & { symbol: string },
+): PositionValuation {
+  return {
+    quantity: 1,
+    avgCost: 400,
+    costBasis: 400,
+    name: null,
+    currency: "USD",
+    price: 500,
+    marketValue: 500,
+    unrealizedPnl: 100,
+    unrealizedPnlPct: 25,
+    weight: 50,
+    realizedPnl: 0,
+    status: "LIVE",
+    ...overrides,
+  };
+}
+
+function makeSummary(overrides: Partial<PortfolioSummary>): PortfolioSummary {
+  return { ...baseSummary, ...overrides };
+}
+
+describe("PortfolioSummaryCard — stale quote note", () => {
+  it("notes how many positions are valued on stale quotes", () => {
+    const summary = makeSummary({
+      positions: [
+        pos({ symbol: "VOO", status: "DELAYED" }),
+        pos({ symbol: "QQQM", status: "STALE" }),
+      ],
+    });
+    wrap(<PortfolioSummaryCard summary={summary} />);
+    expect(screen.getByText(/1개 종목.*마지막 정상 시세/)).toBeInTheDocument();
+  });
+
+  it("does not render the stale note when no positions are stale", () => {
+    const summary = makeSummary({
+      positions: [
+        pos({ symbol: "VOO", status: "LIVE" }),
+        pos({ symbol: "QQQM", status: "DELAYED" }),
+      ],
+    });
+    wrap(<PortfolioSummaryCard summary={summary} />);
+    expect(screen.queryByText(/마지막 정상 시세/)).not.toBeInTheDocument();
   });
 });
