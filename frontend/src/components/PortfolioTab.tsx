@@ -1,34 +1,19 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../api/client";
 import type { PortfolioSummary } from "../api/types";
-import { changeClass, formatPct } from "../lib/format";
+import { useIsMobile } from "../hooks/useIsMobile";
+import { changeClass, formatPct, num, qtyFmt, signed } from "../lib/format";
 import { useUIStore } from "../store/uiStore";
 import { DataStatusBadge } from "./DataStatusBadge";
 import { Panel } from "./Panel";
 import { PortfolioSummaryCard } from "./PortfolioSummaryCard";
+import { PositionCard } from "./PositionCard";
 import { TransactionForm } from "./TransactionForm";
 import { TransactionList } from "./TransactionList";
 
-function num(v: number | null, digits = 2): string {
-  return v == null
-    ? "—"
-    : v.toLocaleString("ko-KR", {
-        minimumFractionDigits: digits,
-        maximumFractionDigits: digits,
-      });
-}
-
-function qtyFmt(v: number): string {
-  return v.toLocaleString("ko-KR", { maximumFractionDigits: 4 });
-}
-
-function signed(v: number | null): string {
-  if (v == null) return "—";
-  return `${v >= 0 ? "+" : ""}${num(v)}`;
-}
-
 export function PortfolioTab() {
   const { setSymbol, setTab } = useUIStore();
+  const isMobile = useIsMobile();
   const qc = useQueryClient();
 
   const portfolio = useQuery({
@@ -81,56 +66,63 @@ export function PortfolioTab() {
           </div>
         )}
 
-        {hasPositions && (
-          <table className="pf-table">
-            <thead>
-              <tr>
-                <th>종목</th>
-                <th>통화</th>
-                <th className="r">수량</th>
-                <th className="r">평단</th>
-                <th className="r">현재가</th>
-                <th className="r">평가액</th>
-                <th className="r">미실현손익</th>
-                <th className="r">실현손익</th>
-                <th className="r">비중</th>
-              </tr>
-            </thead>
-            <tbody>
+        {hasPositions &&
+          (isMobile ? (
+            <div className="pos-cards">
               {summary!.positions.map((p) => (
-                <tr key={p.symbol}>
-                  <td className="pf-sym" onClick={() => openChart(p.symbol)}>
-                    {p.symbol}
-                  </td>
-                  <td>
-                    <span className="pf-ccy">{p.currency ?? "—"}</span>
-                  </td>
-                  <td className="r">{qtyFmt(p.quantity)}</td>
-                  <td className="r">{num(p.avgCost)}</td>
-                  <td className="r">
-                    {p.price == null ? (
-                      <DataStatusBadge status={p.status} />
-                    ) : (
-                      num(p.price)
-                    )}
-                  </td>
-                  <td className="r">{num(p.marketValue)}</td>
-                  <td className={`r ${changeClass(p.unrealizedPnl)}`}>
-                    {p.unrealizedPnl == null
-                      ? "—"
-                      : `${signed(p.unrealizedPnl)} (${formatPct(p.unrealizedPnlPct)})`}
-                  </td>
-                  <td className={`r ${changeClass(p.realizedPnl)}`}>
-                    {signed(p.realizedPnl)}
-                  </td>
-                  <td className="r">
-                    {p.weight == null ? "—" : `${p.weight.toFixed(1)}%`}
-                  </td>
-                </tr>
+                <PositionCard key={p.symbol} p={p} onOpen={openChart} />
               ))}
-            </tbody>
-          </table>
-        )}
+            </div>
+          ) : (
+            <table className="pf-table">
+              <thead>
+                <tr>
+                  <th>종목</th>
+                  <th>통화</th>
+                  <th className="r">수량</th>
+                  <th className="r">평단</th>
+                  <th className="r">현재가</th>
+                  <th className="r">평가액</th>
+                  <th className="r">미실현손익</th>
+                  <th className="r">실현손익</th>
+                  <th className="r">비중</th>
+                </tr>
+              </thead>
+              <tbody>
+                {summary!.positions.map((p) => (
+                  <tr key={p.symbol}>
+                    <td className="pf-sym" onClick={() => openChart(p.symbol)}>
+                      {p.symbol}
+                    </td>
+                    <td>
+                      <span className="pf-ccy">{p.currency ?? "—"}</span>
+                    </td>
+                    <td className="r">{qtyFmt(p.quantity)}</td>
+                    <td className="r">{num(p.avgCost)}</td>
+                    <td className="r">
+                      {p.price == null ? (
+                        <DataStatusBadge status={p.status} />
+                      ) : (
+                        num(p.price)
+                      )}
+                    </td>
+                    <td className="r">{num(p.marketValue)}</td>
+                    <td className={`r ${changeClass(p.unrealizedPnl)}`}>
+                      {p.unrealizedPnl == null
+                        ? "—"
+                        : `${signed(p.unrealizedPnl)} (${formatPct(p.unrealizedPnlPct)})`}
+                    </td>
+                    <td className={`r ${changeClass(p.realizedPnl)}`}>
+                      {signed(p.realizedPnl)}
+                    </td>
+                    <td className="r">
+                      {p.weight == null ? "—" : `${p.weight.toFixed(1)}%`}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ))}
       </Panel>
 
       <Panel title="거래내역">

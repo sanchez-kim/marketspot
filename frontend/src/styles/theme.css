@@ -2286,3 +2286,156 @@ body {
   border-bottom: 1px solid var(--border);
   word-break: keep-all;
 }
+
+/* ============================================================
+   모바일(폰, ≤640px) — 표현 계층만. 데이터/상태는 동일.
+   ============================================================ */
+@media (max-width: 640px) {
+  :root {
+    --pad: 8px;
+  }
+  /* 화면을 넓게: 좌우 여백 축소 */
+  .home {
+    padding: 12px;
+  }
+  /* 살펴보기: 좌우 여백 축소 + 가로 flex→세로(관심종목은 가로 칩 스트립) */
+  .symbol {
+    padding: 10px;
+    flex-direction: column;
+  }
+  /* 셸을 세로로: 본문 위, 하단 탭바 아래 */
+  .app-main {
+    flex-direction: column;
+  }
+  .app-body {
+    /* 하단 탭바(56px)에 콘텐츠가 가려지지 않게 */
+    padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+  }
+  /* AI 패널: 고정폭 사이드바 대신 전체화면 시트 */
+  .ai-side {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100dvh;
+    z-index: 180; /* 하단 탭바(150) 위 */
+    border-left: none;
+  }
+  /* 상단 탭은 하단 탭바로 이동 → TopBar 에서는 숨김 */
+  .topbar nav {
+    display: none;
+  }
+  /* 하단 고정 탭바 */
+  .bottom-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 150;
+    display: flex;
+    background: var(--bg-panel);
+    border-top: 1px solid var(--border);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .bn-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 0;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .bn-item.active {
+    color: var(--accent);
+  }
+  .bn-icon {
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  .rail-chips {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .chip-row {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .wl-chip {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--bg-elev);
+    color: var(--text);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .wl-chip.active {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* 포트폴리오: 표 대신 종목 카드 */
+  .pos-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .pos-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-elev);
+    padding: 12px;
+  }
+  .pos-card-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .pos-sym {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 16px;
+    font-weight: 600;
+    padding: 0;
+    cursor: pointer;
+  }
+  .pos-mv {
+    font-size: 16px;
+    font-variant-numeric: tabular-nums;
+  }
+  .pos-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    row-gap: 6px;
+    column-gap: 12px;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+  .pos-k {
+    color: var(--text-dim);
+  }
+  .pos-v {
+    text-align: right;
+  }
+  /* 거래내역 표는 카드화 대신 가로 스크롤로 오버플로 방지 */
+  .txn-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}

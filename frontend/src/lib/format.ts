@@ -27,6 +27,28 @@ export function statusMeta(
   return base;
 }
 
+// ── 공유 포트폴리오 포맷터 ────────────────────────────────────────
+// PortfolioTab(데스크톱 표)과 PositionCard(폰 카드)가 공유한다.
+// 가짜 숫자 금지: null → "—", 부호 표기 포함.
+
+export function num(v: number | null, digits = 2): string {
+  return v == null
+    ? "—"
+    : v.toLocaleString("ko-KR", {
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits,
+      });
+}
+
+export function qtyFmt(v: number): string {
+  return v.toLocaleString("ko-KR", { maximumFractionDigits: 4 });
+}
+
+export function signed(v: number | null): string {
+  if (v == null) return "—";
+  return `${v > 0 ? "+" : ""}${num(v)}`;
+}
+
 // ── 숫자 포맷 ──────────────────────────────────────────────────────
 export function formatPrice(value: number): string {
   return value.toLocaleString("ko-KR", {

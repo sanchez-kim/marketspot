@@ -1,8 +1,16 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { useIsMobile } from "../hooks/useIsMobile";
 import { PortfolioTab } from "./PortfolioTab";
 import type { PortfolioSummary } from "../api/types";
+
+vi.mock("../hooks/useIsMobile");
+
+// Default all existing tests to desktop so matchMedia absence in jsdom is not an issue.
+beforeEach(() => {
+  vi.mocked(useIsMobile).mockReturnValue(false);
+});
 
 function makeSummary(): PortfolioSummary {
   return {

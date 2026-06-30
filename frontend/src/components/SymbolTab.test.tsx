@@ -1,8 +1,16 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { useIsMobile } from "../hooks/useIsMobile";
 import { SymbolTab } from "./SymbolTab";
 import type { ValuationContext } from "../api/types";
+
+vi.mock("../hooks/useIsMobile");
+
+// Default all existing tests to desktop so matchMedia absence in jsdom is not an issue.
+beforeEach(() => {
+  vi.mocked(useIsMobile).mockReturnValue(false);
+});
 
 function renderWithEmptyWatchlist() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -61,5 +69,27 @@ describe("SymbolTab watchlist rail empty state", () => {
   it("shows search guidance when watchlist is empty", () => {
     renderWithEmptyWatchlist();
     expect(screen.getByText(/검색으로 종목을 추가/)).toBeInTheDocument();
+  });
+
+  it("shows search guidance on mobile when watchlist is empty", () => {
+    vi.mocked(useIsMobile).mockReturnValue(true);
+    renderWithEmptyWatchlist();
+    expect(screen.getByText(/검색으로 종목을 추가/)).toBeInTheDocument();
+  });
+});
+
+describe("SymbolTab responsive watchlist", () => {
+  it("renders a horizontal chip strip on phone (not the vertical rail)", () => {
+    vi.mocked(useIsMobile).mockReturnValue(true);
+    const { container } = renderWithCache();
+    expect(container.querySelector(".rail-chips")).not.toBeNull();
+    expect(container.querySelector(".symbol-rail")).toBeNull();
+  });
+
+  it("renders the vertical rail on desktop", () => {
+    vi.mocked(useIsMobile).mockReturnValue(false);
+    const { container } = renderWithCache();
+    expect(container.querySelector(".symbol-rail")).not.toBeNull();
+    expect(container.querySelector(".rail-chips")).toBeNull();
   });
 });
