@@ -2309,6 +2309,15 @@ body {
     /* 하단 탭바(56px)에 콘텐츠가 가려지지 않게 */
     padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
   }
+  /* AI 패널: 고정폭 사이드바 대신 전체화면 시트 */
+  .ai-side {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100dvh;
+    z-index: 180; /* 하단 탭바(150) 위 */
+    border-left: none;
+  }
   /* 상단 탭은 하단 탭바로 이동 → TopBar 에서는 숨김 */
   .topbar nav {
     display: none;
