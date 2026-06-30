@@ -116,6 +116,27 @@ async def test_transient_error_serves_last_good_as_stale() -> None:
     assert served.source == "p1"  # 원본 소스 보존
 
 
+async def test_rate_limited_serves_last_good_as_stale() -> None:
+    # RATE_LIMITED (반환됨 상태) → last-good STALE 폴백.
+    store = LastGoodStore()
+    clk: dict[str, float] = {"v": 0.0}
+    reg = ProviderRegistry(
+        {"US": [FakeProvider("p1", quote_status=DataStatus.DELAYED)]},
+        store=store,
+        clock=lambda: clk["v"],
+    )
+    await reg.get_quote("AAPL")
+    clk["v"] = 10.0
+    reg2 = ProviderRegistry(
+        {"US": [FakeProvider("p1", quote_status=DataStatus.RATE_LIMITED)]},
+        store=store,
+        clock=lambda: clk["v"],
+    )
+    served = await reg2.get_quote("AAPL")
+    assert served.status is DataStatus.STALE
+    assert served.data is not None
+
+
 async def test_no_data_is_not_overridden_by_stale() -> None:
     store = LastGoodStore()
     reg = ProviderRegistry(
