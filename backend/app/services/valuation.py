@@ -61,20 +61,26 @@ class ValuationService:
         position: float | None = None
 
         as_of = None
+        bars_stale = False
         env = await self._registry.get_bars(symbol, _PERIOD, _INTERVAL)
         if env.data is not None and env.status in _HAS_DATA and env.data:
             closes = [b.close for b in env.data]
             price = closes[-1]
             as_of = env.as_of
+            bars_stale = env.status == DataStatus.STALE
             ma200 = _sma(closes, 200)
             if ma200 is not None:
                 vs_ma200 = round((price / ma200 - 1) * 100, 1)
             if fund.week52_low is not None and fund.week52_high is not None:
                 position = week52_position(price, fund.week52_low, fund.week52_high)
 
+        # Worst-case freshness: STALE bars must not be hidden behind a fresher
+        # fundamentals badge — mirrors RiskService pattern (STALE > DELAYED > LIVE).
+        reported_status = DataStatus.STALE if bars_stale else fund.status
+
         return ValuationContext(
             symbol=symbol.upper(),
-            status=fund.status,
+            status=reported_status,
             as_of=as_of,
             pe_ratio=fund.pe_ratio,
             pe_5y_avg=None,
