@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { SymbolTab } from "./SymbolTab";
-import type { ValuationContext } from "../api/types";
+import type { DataEnvelope, Quote, ValuationContext } from "../api/types";
 
 vi.mock("../hooks/useIsMobile");
 
@@ -42,6 +42,33 @@ function renderWithCache() {
   };
   qc.setQueryData(["valuation", "VOO"], val);
   qc.setQueryData(["settings"], { watchlist: ["VOO"], defaultSymbol: "VOO" });
+  return render(
+    <QueryClientProvider client={qc}>
+      <SymbolTab />
+    </QueryClientProvider>,
+  );
+}
+
+function renderWithStaleQuote(mobile: boolean) {
+  vi.mocked(useIsMobile).mockReturnValue(mobile);
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const staleEnv: DataEnvelope<Quote> = {
+    data: {
+      symbol: "VOO",
+      price: 688.1,
+      change: -1.5,
+      changePct: -0.22,
+      currency: "USD",
+      name: null,
+    },
+    status: "STALE",
+    source: "yfinance",
+    asOf: "2026-06-30T00:00:00Z",
+    delayMinutes: null,
+    message: null,
+  };
+  qc.setQueryData(["settings"], { watchlist: ["VOO"], defaultSymbol: "VOO" });
+  qc.setQueryData(["quotes", ["VOO"]], { VOO: staleEnv });
   return render(
     <QueryClientProvider client={qc}>
       <SymbolTab />
@@ -91,5 +118,21 @@ describe("SymbolTab responsive watchlist", () => {
     const { container } = renderWithCache();
     expect(container.querySelector(".symbol-rail")).not.toBeNull();
     expect(container.querySelector(".rail-chips")).toBeNull();
+  });
+});
+
+describe("SymbolTab STALE quote rendering (§0 honesty)", () => {
+  it("desktop rail: shows STALE badge and no colored changePct for a STALE quote", () => {
+    const { container } = renderWithStaleQuote(false);
+    expect(screen.getByText(/갱신지연/)).toBeInTheDocument();
+    const coloredSpans = container.querySelectorAll("span.up, span.down, span.flat");
+    expect(coloredSpans.length).toBe(0);
+  });
+
+  it("mobile chip: shows STALE badge and no colored changePct for a STALE quote", () => {
+    const { container } = renderWithStaleQuote(true);
+    expect(screen.getByText(/갱신지연/)).toBeInTheDocument();
+    const coloredSpans = container.querySelectorAll("span.up, span.down, span.flat");
+    expect(coloredSpans.length).toBe(0);
   });
 });

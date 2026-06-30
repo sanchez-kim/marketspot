@@ -65,4 +65,20 @@ describe("IndexStrip STALE quote rendering (§0 honesty)", () => {
     expect(screen.queryByText(/5,400/)).not.toBeInTheDocument();
     expect(screen.getByText(/데이터 없음/)).toBeInTheDocument();
   });
+
+  it("does NOT show a colored changePct span when STALE (§0 honesty)", () => {
+    const { container } = renderWithStrip([
+      makeStripItem("SPY", "S&P 500", { status: "STALE", source: "yfinance" }),
+    ]);
+    const coloredSpans = container.querySelectorAll("span.up, span.down, span.flat");
+    expect(coloredSpans.length).toBe(0);
+  });
+
+  it("shows a colored changePct span for a LIVE quote (baseline)", () => {
+    const { container } = renderWithStrip([
+      makeStripItem("SPY", "S&P 500", { status: "LIVE" }),
+    ]);
+    const coloredSpans = container.querySelectorAll("span.up, span.down, span.flat");
+    expect(coloredSpans.length).toBeGreaterThan(0);
+  });
 });

@@ -29,15 +29,19 @@ export function IndexStrip() {
           <div className="strip-item" key={item.symbol}>
             <span className="label">{item.label}</span>
             {q ? (
-              <span className={`value ${changeClass(q.changePct)}`}>
-                {formatPrice(q.price)} {formatPct(q.changePct)}
-                {item.quote.status === "STALE" && (
+              item.quote.status === "STALE" ? (
+                <span className="value">
+                  {formatPrice(q.price)}
                   <DataStatusBadge
                     status={item.quote.status}
                     source={item.quote.source}
                   />
-                )}
-              </span>
+                </span>
+              ) : (
+                <span className={`value ${changeClass(q.changePct)}`}>
+                  {formatPrice(q.price)} {formatPct(q.changePct)}
+                </span>
+              )
             ) : (
               <span className="value">
                 <DataStatusBadge
