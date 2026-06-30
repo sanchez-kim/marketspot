@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api/client";
 import { changeClass, formatPct } from "../lib/format";
+import { useIsMobile } from "../hooks/useIsMobile";
 import { useSettings, useUpdateSettings } from "../hooks/useSettings";
 import { useUIStore } from "../store/uiStore";
 import {
@@ -33,6 +34,7 @@ const SECTIONS: { id: Section; label: string }[] = [
  */
 export function SymbolTab() {
   const { symbol, setSymbol, reviewMode, setReviewMode, askAi } = useUIStore();
+  const isMobile = useIsMobile();
   const [section, setSection] = useState<Section>("info");
   const settings = useSettings();
   const update = useUpdateSettings();
@@ -64,32 +66,59 @@ export function SymbolTab() {
 
   return (
     <div className="symbol">
-      <aside className="symbol-rail">
-        <SymbolSearch onSelect={setSymbol} placeholder="종목 검색" />
-        <div className="rail-list">
-          {watchlist.length === 0 ? (
-            <p className="muted">검색으로 종목을 추가해보세요.</p>
-          ) : (
-            watchlist.map((s) => {
-              const q = quotes.data?.[s]?.data;
-              return (
-                <button
-                  key={s}
-                  className={`rail-row ${s === symbol ? "active" : ""}`}
-                  onClick={() => setSymbol(s)}
-                >
-                  <span className="rail-sym">{s}</span>
-                  {q && (
-                    <span className={changeClass(q.changePct)}>
-                      {formatPct(q.changePct)}
-                    </span>
-                  )}
-                </button>
-              );
-            })
+      {isMobile ? (
+        <div className="rail-chips">
+          <SymbolSearch onSelect={setSymbol} placeholder="종목 검색" />
+          {watchlist.length > 0 && (
+            <div className="chip-row">
+              {watchlist.map((s) => {
+                const q = quotes.data?.[s]?.data;
+                return (
+                  <button
+                    key={s}
+                    className={`wl-chip ${s === symbol ? "active" : ""}`}
+                    onClick={() => setSymbol(s)}
+                  >
+                    <span className="wl-chip-sym">{s}</span>
+                    {q && (
+                      <span className={changeClass(q.changePct)}>
+                        {formatPct(q.changePct)}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           )}
         </div>
-      </aside>
+      ) : (
+        <aside className="symbol-rail">
+          <SymbolSearch onSelect={setSymbol} placeholder="종목 검색" />
+          <div className="rail-list">
+            {watchlist.length === 0 ? (
+              <p className="muted">검색으로 종목을 추가해보세요.</p>
+            ) : (
+              watchlist.map((s) => {
+                const q = quotes.data?.[s]?.data;
+                return (
+                  <button
+                    key={s}
+                    className={`rail-row ${s === symbol ? "active" : ""}`}
+                    onClick={() => setSymbol(s)}
+                  >
+                    <span className="rail-sym">{s}</span>
+                    {q && (
+                      <span className={changeClass(q.changePct)}>
+                        {formatPct(q.changePct)}
+                      </span>
+                    )}
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </aside>
+      )}
 
       <div className="symbol-detail">
         <div className="symbol-detail-head">

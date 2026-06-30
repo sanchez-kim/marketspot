@@ -2354,4 +2354,38 @@ body {
     font-size: 18px;
     line-height: 1;
   }
+
+  /* 살펴보기: 가로 flex → 세로. 관심종목은 가로 칩 스트립 */
+  .symbol {
+    flex-direction: column;
+  }
+  .rail-chips {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .chip-row {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .wl-chip {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--bg-elev);
+    color: var(--text);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .wl-chip.active {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 }
