@@ -1941,6 +1941,15 @@ body {
   font-weight: 700;
   font-size: 16px;
 }
+.review-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.review-label {
+  font-size: 12px;
+  color: var(--text-dim);
+}
 .review-toggle {
   display: inline-flex;
   gap: 2px;

@@ -90,6 +90,16 @@ describe("SymbolTab as Decision Briefing", () => {
     expect(screen.getByText(/추가매수/)).toBeInTheDocument();
     expect(screen.getByText(/설명 요청|AI/)).toBeInTheDocument();
   });
+
+  it("labels the review-mode toggle with an info hint explaining what it changes", () => {
+    renderWithCache();
+    const label = screen.getByText("관점");
+    expect(label).toBeInTheDocument();
+    expect(label.className).toContain("review-label");
+    const hint = label.querySelector(".gloss");
+    expect(hint).toHaveAttribute("title", expect.stringContaining("포트폴리오 영향"));
+    expect(hint?.textContent).toContain("ⓘ");
+  });
 });
 
 describe("SymbolTab watchlist rail empty state", () => {

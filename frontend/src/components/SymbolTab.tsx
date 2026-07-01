@@ -170,22 +170,33 @@ export function SymbolTab() {
         <div className="briefing">
           <div className="briefing-head">
             <span className="briefing-title">살펴보기 · {symbol}</span>
-            <div className="review-toggle" role="group" aria-label="검토 모드">
-              {(
-                [
-                  ["add", "추가매수"],
-                  ["hold", "보유점검"],
-                  ["new", "신규편입"],
-                ] as const
-              ).map(([m, label]) => (
-                <button
-                  key={m}
-                  className={reviewMode === m ? "rt on" : "rt"}
-                  onClick={() => setReviewMode(m)}
+            <div className="review-group">
+              <span className="review-label">
+                관점
+                <span
+                  className="gloss"
+                  title="이 종목을 어떤 상황으로 볼지 — 아래 '포트폴리오 영향'의 강조점이 바뀌어요."
                 >
-                  {label}
-                </button>
-              ))}
+                  <sup className="gloss-i">ⓘ</sup>
+                </span>
+              </span>
+              <div className="review-toggle" role="group" aria-label="검토 모드">
+                {(
+                  [
+                    ["add", "추가매수"],
+                    ["hold", "보유점검"],
+                    ["new", "신규편입"],
+                  ] as const
+                ).map(([m, label]) => (
+                  <button
+                    key={m}
+                    className={reviewMode === m ? "rt on" : "rt"}
+                    onClick={() => setReviewMode(m)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
           <div className="ev-grid">
