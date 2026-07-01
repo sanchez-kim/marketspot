@@ -124,15 +124,37 @@ describe("SymbolTab responsive watchlist", () => {
 describe("SymbolTab STALE quote rendering (§0 honesty)", () => {
   it("desktop rail: shows STALE badge and no colored changePct for a STALE quote", () => {
     const { container } = renderWithStaleQuote(false);
-    expect(screen.getByText(/갱신지연/)).toBeInTheDocument();
+    // 레일 + 헤더 두 곳에 정직하게 STALE 뱃지가 뜬다(둘 다 실시간처럼 보이면 안 됨).
+    expect(screen.getAllByText(/갱신지연/).length).toBeGreaterThan(0);
     const coloredSpans = container.querySelectorAll("span.up, span.down, span.flat");
     expect(coloredSpans.length).toBe(0);
   });
 
   it("mobile chip: shows STALE badge and no colored changePct for a STALE quote", () => {
     const { container } = renderWithStaleQuote(true);
-    expect(screen.getByText(/갱신지연/)).toBeInTheDocument();
+    expect(screen.getAllByText(/갱신지연/).length).toBeGreaterThan(0);
     const coloredSpans = container.querySelectorAll("span.up, span.down, span.flat");
     expect(coloredSpans.length).toBe(0);
+  });
+});
+
+describe("SymbolTab header price line (#1 timing legibility, §0 honesty)", () => {
+  it("shows the current symbol's price + STALE badge/age (not a colored %) in the detail head", () => {
+    const { container } = renderWithStaleQuote(false);
+    const head = container.querySelector(".symbol-detail-head");
+    expect(head).not.toBeNull();
+    const priceEl = head!.querySelector(".sym-price");
+    expect(priceEl).not.toBeNull();
+    expect(priceEl!.textContent).toContain("688.10");
+    expect(priceEl!.querySelector(".status-badge")).not.toBeNull();
+    expect(priceEl!.textContent).toMatch(/분 전|시간 전/);
+    expect(priceEl!.querySelector("span.up, span.down, span.flat")).toBeNull();
+  });
+
+  it("renders nothing in the price line when the current symbol has no quote (not in watchlist)", () => {
+    const { container } = renderWithEmptyWatchlist();
+    const head = container.querySelector(".symbol-detail-head");
+    expect(head).not.toBeNull();
+    expect(head!.querySelector(".sym-price")).toBeNull();
   });
 });

@@ -1407,6 +1407,13 @@ body {
   font-size: 19px;
   font-weight: 700;
 }
+.sym-price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+  font-size: 15px;
+}
 .watch-toggle {
   background: var(--bg-elev);
   border: 1px solid var(--border);

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api/client";
-import { changeClass, formatPct } from "../lib/format";
+import { changeClass, formatPct, formatPrice, staleAge } from "../lib/format";
 import { DataStatusBadge } from "./DataStatusBadge";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { useSettings, useUpdateSettings } from "../hooks/useSettings";
@@ -135,6 +135,28 @@ export function SymbolTab() {
       <div className="symbol-detail">
         <div className="symbol-detail-head">
           <span className="symbol-name">{symbol}</span>
+          {(() => {
+            const env = quotes.data?.[symbol.toUpperCase()];
+            const q = env?.data;
+            if (!env || !q) return null;
+            return (
+              <span className="sym-price">
+                <b>{formatPrice(q.price)}</b>
+                {env.status === "STALE" ? (
+                  <span className="quote-stale">
+                    <DataStatusBadge status="STALE" source={env.source} />
+                    <span className="muted q-age">
+                      {staleAge(env.asOf, env.delayMinutes)}
+                    </span>
+                  </span>
+                ) : (
+                  <span className={changeClass(q.changePct)}>
+                    {formatPct(q.changePct)}
+                  </span>
+                )}
+              </span>
+            );
+          })()}
           <button
             className={`watch-toggle ${isWatched ? "on" : ""}`}
             onClick={toggleWatch}
