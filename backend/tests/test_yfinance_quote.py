@@ -10,7 +10,11 @@ import pytest
 
 from app.models import DataStatus, Quote
 from app.providers import yfinance_provider
-from app.providers.yfinance_provider import YFinanceProvider, quote_from_fast_info
+from app.providers.yfinance_provider import (
+    YFinanceProvider,
+    _is_rate_limited,
+    quote_from_fast_info,
+)
 
 
 class FakeFastInfo:
@@ -100,3 +104,39 @@ async def test_us_quote_stays_delayed(monkeypatch: pytest.MonkeyPatch) -> None:
     env = await YFinanceProvider().get_quote("VOO")
     assert env.status is DataStatus.DELAYED
     assert env.delay_minutes == 15
+
+
+# ── Task 3: 전용 풀·타임아웃·레이트리밋 분류 ──────────────────────────────
+
+
+async def test_rate_limit_exception_maps_to_rate_limited(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """메시지 기반 레이트리밋 폴백: _is_rate_limited 패턴 감지 → RATE_LIMITED 반환."""
+
+    class FakeRateLimit(Exception):
+        pass
+
+    def boom(*a: object, **k: object) -> Quote | None:
+        raise FakeRateLimit("Too Many Requests. Rate limited.")
+
+    monkeypatch.setattr(yfinance_provider, "_fetch_quote", boom)
+    env = await YFinanceProvider().get_quote("AAPL")
+    assert env.status is DataStatus.RATE_LIMITED
+
+
+async def test_timeout_maps_to_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    """TimeoutError 는 ERROR 로 분류(재시도 없음)."""
+
+    def boom(*a: object, **k: object) -> Quote | None:
+        raise TimeoutError("응답 시간 초과")
+
+    monkeypatch.setattr(yfinance_provider, "_fetch_quote", boom)
+    env = await YFinanceProvider().get_quote("AAPL")
+    assert env.status is DataStatus.ERROR
+
+
+def test_is_rate_limited_detects_429_message() -> None:
+    """_is_rate_limited: 429 메시지 감지 + KeyError 는 False."""
+    assert _is_rate_limited(Exception("HTTP 429 Too Many Requests")) is True
+    assert _is_rate_limited(KeyError("exchangeTimezoneName")) is False

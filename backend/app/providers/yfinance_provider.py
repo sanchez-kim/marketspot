@@ -11,10 +11,15 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
+from typing import Any, TypeVar
 
 from ..models import Bar, DataEnvelope, DataStatus, Quote
 from .base import market_of
+
+_T = TypeVar("_T")
 
 # API 파라미터 → yfinance 파라미터 매핑
 _PERIOD_MAP = {
@@ -35,6 +40,32 @@ _INTERVAL_MAP = {
 # 미국 정규장 무료 데이터의 통상 지연(분)
 _US_DELAY_MINUTES = 15
 
+# yfinance(동기·블로킹) 전용 바운드 풀 — 타임아웃으로 leak 된 스레드가 공용
+# default executor(다른 프로바이더)를 굶기지 못하게 격리한다.
+_YF_POOL = ThreadPoolExecutor(max_workers=4, thread_name_prefix="yf")
+_YF_TIMEOUT_S = 8.0  # 테스트에서 monkeypatch 가능
+
+
+def _is_rate_limited(exc: BaseException) -> bool:
+    """yfinance 레이트리밋 여부. 전용 예외 우선, 메시지/타입명 문자열은 보조."""
+    try:
+        from yfinance.exceptions import YFRateLimitError
+
+        if isinstance(exc, YFRateLimitError):
+            return True
+    except ImportError:
+        pass
+    text = f"{type(exc).__name__} {exc}".lower()
+    return "429" in text or "too many requests" in text or "rate limit" in text
+
+
+async def _run_yf(fn: Callable[..., _T], *args: Any) -> _T:
+    """yfinance 동기 호출을 전용 풀에서 실행하고 데드라인을 건다."""
+    loop = asyncio.get_running_loop()
+    return await asyncio.wait_for(
+        loop.run_in_executor(_YF_POOL, fn, *args), timeout=_YF_TIMEOUT_S + 2.0
+    )
+
 
 class YFinanceProvider:
     name = "yfinance"
@@ -50,9 +81,9 @@ class YFinanceProvider:
             )
 
         try:
-            # ★ yfinance 는 동기(blocking) — 스레드로 오프로드해 이벤트 루프를
-            #   막지 않게 한다(동시 요청이 진짜 병렬로 처리됨).
-            quote = await asyncio.to_thread(_fetch_quote, yf, symbol)
+            # ★ yfinance 는 동기(blocking) — 전용 풀(_YF_POOL)에서 오프로드해
+            #   이벤트 루프를 막지 않는다. asyncio.wait_for 가 데드라인을 건다.
+            quote = await _run_yf(_fetch_quote, yf, symbol)
         except KeyError as exc:
             # yfinance FastInfo 는 데이터 없는 심볼에서 KeyError
             # (예: 'exchangeTimezoneName')를 던진다 — 시스템 오류가 아니라
@@ -62,7 +93,19 @@ class YFinanceProvider:
                 status=DataStatus.NO_DATA,
                 message=f"'{symbol}' 시세를 찾을 수 없습니다 ({exc})",
             )
+        except TimeoutError:
+            return DataEnvelope[Quote].empty(
+                source=self.name,
+                status=DataStatus.ERROR,
+                message="시세 응답 시간 초과",
+            )
         except Exception as exc:  # noqa: BLE001
+            if _is_rate_limited(exc):
+                return DataEnvelope[Quote].empty(
+                    source=self.name,
+                    status=DataStatus.RATE_LIMITED,
+                    message=f"호출 제한: {exc}",
+                )
             return DataEnvelope[Quote].empty(
                 source=self.name,
                 status=DataStatus.ERROR,
@@ -100,10 +143,20 @@ class YFinanceProvider:
             )
 
         try:
-            bars = await asyncio.to_thread(
-                _fetch_bars, yf, symbol, yf_period, yf_interval
+            bars = await _run_yf(_fetch_bars, yf, symbol, yf_period, yf_interval)
+        except TimeoutError:
+            return DataEnvelope[list[Bar]].empty(
+                source=self.name,
+                status=DataStatus.ERROR,
+                message="차트 응답 시간 초과",
             )
         except Exception as exc:  # noqa: BLE001
+            if _is_rate_limited(exc):
+                return DataEnvelope[list[Bar]].empty(
+                    source=self.name,
+                    status=DataStatus.RATE_LIMITED,
+                    message=f"호출 제한: {exc}",
+                )
             return DataEnvelope[list[Bar]].empty(
                 source=self.name,
                 status=DataStatus.ERROR,
@@ -157,7 +210,9 @@ def _fetch_quote(yf: object, symbol: str) -> Quote | None:
 def _fetch_bars(yf: object, symbol: str, period: str, interval: str) -> list[Bar]:
     """동기 yfinance 봉 조회 + 변환(스레드에서 실행)."""
     ticker = yf.Ticker(symbol)  # type: ignore[attr-defined]
-    return _frame_to_bars(ticker.history(period=period, interval=interval))
+    return _frame_to_bars(
+        ticker.history(period=period, interval=interval, timeout=_YF_TIMEOUT_S)
+    )
 
 
 def quote_from_fast_info(symbol: str, info: object) -> Quote | None:

@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api/client";
 import type { DrawdownContext } from "../api/types";
-import { changeClass, formatPct, formatPrice } from "../lib/format";
+import { changeClass, formatPct, formatPrice, staleAge } from "../lib/format";
 import { useSettings, useUpdateSettings } from "../hooks/useSettings";
 import { useUIStore } from "../store/uiStore";
 import { DataStatusBadge } from "./DataStatusBadge";
@@ -88,9 +88,18 @@ export function HomeWatchlist() {
               {q ? (
                 <>
                   <span>{formatPrice(q.price)}</span>
-                  <span className={changeClass(q.changePct)}>
-                    {formatPct(q.changePct)}
-                  </span>
+                  {env.status === "STALE" ? (
+                    <span className="quote-stale">
+                      <DataStatusBadge status={env.status} source={env.source} />
+                      <span className="muted q-age">
+                        {staleAge(env.asOf, env.delayMinutes)}
+                      </span>
+                    </span>
+                  ) : (
+                    <span className={changeClass(q.changePct)}>
+                      {formatPct(q.changePct)}
+                    </span>
+                  )}
                 </>
               ) : env ? (
                 <DataStatusBadge status={env.status} />

@@ -64,6 +64,8 @@ export function PortfolioSummaryCard({ summary: s }: Props) {
       ? fmtCurrency(s.realizedKrw, "KRW", true)
       : fmtCurrency(s.realizedUsd, "USD", true);
 
+  const staleCount = s.positions.filter((p) => p.status === "STALE").length;
+
   // fx 없을 때 보여줄 배지: 선택 통화가 KRW이고 valueKrw === null 이면 fxStatus 배지 노출
   const fxUnavailable =
     (baseCurrency === "KRW" && s.valueKrw === null) ||
@@ -145,6 +147,12 @@ export function PortfolioSummaryCard({ summary: s }: Props) {
         <div className="muted pf-card-note">
           시세 못 받은 {s.unvaluedCount}종목은 합계에서 제외했어요.
         </div>
+      )}
+
+      {staleCount > 0 && (
+        <p className="pf-stale-note muted">
+          {staleCount}개 종목은 마지막 정상 시세 기준이에요(실시간 조회 실패).
+        </p>
       )}
     </div>
   );

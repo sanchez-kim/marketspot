@@ -116,6 +116,23 @@ export function formLabel(form: string): string {
   return FORM_GLOSS[form.toUpperCase()] ?? FORM_GLOSS[form] ?? form;
 }
 
+/**
+ * STALE/지연 데이터의 나이를 "약 N분 전"으로. 데이터 실제 시각(asOf)에
+ * 지연(delayMinutes)을 더해 과소표기하지 않는다(§0). asOf 없으면 null.
+ */
+export function staleAge(
+  asOf: string | null,
+  delayMinutes: number | null,
+  nowMs: number = Date.now(),
+): string | null {
+  if (!asOf) return null;
+  const elapsedMin = Math.max(0, (nowMs - Date.parse(asOf)) / 60000);
+  const total = Math.round(elapsedMin + (delayMinutes ?? 0));
+  if (total < 60) return `약 ${total}분 전`;
+  const h = Math.floor(total / 60);
+  return `약 ${h}시간 전`;
+}
+
 // AI 백엔드 라벨 — 어떤 엔진이 답했는지 정직하게 표시
 export function backendLabel(backend: string): string {
   switch (backend) {

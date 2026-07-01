@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { changeClass, formatPct, formLabel, statusMeta } from "./format";
+import { changeClass, formatPct, formLabel, staleAge, statusMeta } from "./format";
 
 describe("statusMeta", () => {
   it("지연은 분 수를 라벨에 포함", () => {
@@ -39,5 +39,17 @@ describe("changeClass", () => {
     expect(changeClass(-1)).toBe("down");
     expect(changeClass(0)).toBe("flat");
     expect(changeClass(null)).toBe("flat");
+  });
+});
+
+describe("staleAge", () => {
+  it("includes delay so it does not understate true age", () => {
+    const asOf = "2026-06-30T00:00:00Z";
+    const now = Date.parse("2026-06-30T00:02:00Z"); // fetch 2분 전
+    // 2분 경과 + 15분 지연 = 약 17분
+    expect(staleAge(asOf, 15, now)).toMatch(/17분/);
+  });
+  it("returns null when asOf is missing", () => {
+    expect(staleAge(null, 15, Date.now())).toBeNull();
   });
 });
