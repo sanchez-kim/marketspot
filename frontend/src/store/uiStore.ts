@@ -63,7 +63,7 @@ export const useUIStore = create<UIState>((set) => ({
   interval: "1D",
   upColor: "green",
   density: "comfortable",
-  baseCurrency: "USD",
+  baseCurrency: "KRW",
 
   aiOpen: false,
   aiMessages: [],

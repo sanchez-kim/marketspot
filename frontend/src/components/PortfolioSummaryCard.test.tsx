@@ -14,7 +14,7 @@ function wrap(ui: React.ReactElement) {
 
 // Reset zustand to default state between tests so currency toggle doesn't bleed.
 afterEach(() => {
-  useUIStore.setState({ baseCurrency: "USD" });
+  useUIStore.setState({ baseCurrency: "KRW" });
 });
 
 // Minimal PortfolioSummary with both KRW and USD currency fields.
