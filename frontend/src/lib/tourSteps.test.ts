@@ -26,4 +26,8 @@ describe("tour + help content", () => {
     ].join(" ");
     for (const bad of FORBIDDEN) expect(all).not.toContain(bad);
   });
+  it("AI step mentions Ollama running requirement", () => {
+    const aiStep = TOUR_STEPS.find((s) => s.id === "ai");
+    expect(aiStep?.body).toContain("로컬 AI(Ollama)가 켜져 있으면");
+  });
 });

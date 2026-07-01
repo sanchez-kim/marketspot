@@ -38,7 +38,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "ai",
     title: "④ AI 도우미",
-    body: "모르는 용어나 숫자가 나오면 여기서 편하게 물어보세요. 쉬운 말로 풀어드려요.",
+    body: "모르는 용어나 숫자가 나오면 여기서 물어보세요. 로컬 AI(Ollama)가 켜져 있으면 더 자세히 풀어드려요.",
     selector: ".ai-toggle, [data-tour='ai']",
   },
   {
