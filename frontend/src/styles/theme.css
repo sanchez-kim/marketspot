@@ -1128,6 +1128,13 @@ body {
   font-size: 15px;
   line-height: 1.6;
 }
+.dd-axis {
+  margin-bottom: 6px;
+}
+.dd-axis-title {
+  font-weight: 600;
+  font-size: 14px;
+}
 .dd-head {
   display: flex;
   justify-content: space-between;

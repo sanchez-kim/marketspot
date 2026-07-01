@@ -31,9 +31,9 @@ export function DrawdownCard({ ctx }: Props) {
 
   return (
     <div className="dd-card">
-      <div className="dd-head">
-        <span className="dd-sym">
-          {ctx.symbol}
+      <div className="dd-axis">
+        <span className="dd-axis-title">
+          기저율
           <span
             className="gloss"
             title={AXIS_GUIDE.find((g) => g.title === "기저율")?.text}
@@ -41,6 +41,9 @@ export function DrawdownCard({ ctx }: Props) {
             <sup className="gloss-i">ⓘ</sup>
           </span>
         </span>
+      </div>
+      <div className="dd-head">
+        <span className="dd-sym">{ctx.symbol}</span>
         <span className="dd-dd">
           고점 대비 {dd == null ? "—" : `${dd.toFixed(1)}%`}
         </span>

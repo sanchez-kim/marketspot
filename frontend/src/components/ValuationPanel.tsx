@@ -16,7 +16,12 @@ export function ValuationPanel({ data }: { data: ValuationContext | null }) {
           <span className="ev-title">밸류·과열도</span>
           {data && <DataStatusBadge status={data.status} />}
         </div>
-        <div className="ev-empty">{data?.message ?? "근거를 불러오지 못했습니다"}</div>
+        <div className="ev-empty">
+          {data?.message ??
+            (data?.status === "NO_DATA"
+              ? "아직 볼 게 없어요."
+              : "근거를 불러오지 못했습니다")}
+        </div>
       </div>
     );
   }

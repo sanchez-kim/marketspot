@@ -55,4 +55,25 @@ describe("ValuationPanel", () => {
       screen.getByText(/근거를 불러오지 못했습니다|불러오는 중|—/),
     ).toBeInTheDocument();
   });
+
+  it("shows a friendly '아직 볼 게 없어요' message for NO_DATA without a backend message (not a bug-sounding error)", () => {
+    render(<ValuationPanel data={{ ...base, status: "NO_DATA", message: null }} />);
+    expect(screen.getByText(/아직 볼 게 없어요/)).toBeInTheDocument();
+    expect(screen.queryByText("근거를 불러오지 못했습니다")).not.toBeInTheDocument();
+  });
+
+  it("keeps the generic failure message for a true ERROR status", () => {
+    render(<ValuationPanel data={{ ...base, status: "ERROR", message: null }} />);
+    expect(screen.getByText("근거를 불러오지 못했습니다")).toBeInTheDocument();
+  });
+
+  it("prefers the backend's honest message when present, even for NO_DATA", () => {
+    render(
+      <ValuationPanel
+        data={{ ...base, status: "NO_DATA", message: "심볼을 찾을 수 없습니다" }}
+      />,
+    );
+    expect(screen.getByText("심볼을 찾을 수 없습니다")).toBeInTheDocument();
+    expect(screen.queryByText(/아직 볼 게 없어요/)).not.toBeInTheDocument();
+  });
 });
