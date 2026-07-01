@@ -3,20 +3,23 @@
 #   docker compose up --build # 의존성/Dockerfile 바뀌었을 때
 # 코드는 볼륨 마운트라 편집 즉시 반영(백엔드 uvicorn --reload, 프론트 Vite HMR).
 # Ollama 는 호스트(11434)의 기존 인스턴스를 재사용한다(모델 재다운로드 X).
+# 호스트 바인딩은 127.0.0.1(로컬 전용) — 이 앱은 무인증이라 기본값을 안전하게 유지한다.
+# LAN 공유가 필요하면 아래 ports 를 "0.0.0.0:PORT:PORT" 로 바꾸되, 그 순간부터 같은
+# 네트워크의 누구나 접근 가능하다는 것을 인지할 것.
 name: marketspot
 
 services:
   backend:
     build: ./backend
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     volumes:
       - ./backend:/app # 라이브 코드 + ./backend/data 의 settings.json 영속
     environment:
       # 호스트 Ollama 재사용 (qwen3-vl:8b 이미 받아둔 것).
       OLLAMA_HOST: http://host.docker.internal:11434
-      # SEC 공시 호출용 연락처 포함 User-Agent (예의상 권장).
-      SEC_USER_AGENT: "MarketSpot/0.1 (local dev; sanchez.kim.kr@gmail.com)"
+      # SEC 공시 호출용 연락처 포함 User-Agent (.env 의 SEC_USER_AGENT 로 덮어쓰기 가능).
+      SEC_USER_AGENT: "${SEC_USER_AGENT:-MarketSpot/0.1 (self-host; contact: you@example.com)}"
       STOCK_TERMINAL_DATA_DIR: /app/data
       # macOS 볼륨 마운트에서 파일변경 감지를 확실히 하려고 폴링 강제.
       WATCHFILES_FORCE_POLLING: "true"
@@ -26,7 +29,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "4000:4000"
+      - "127.0.0.1:4000:4000"
     volumes:
       - ./frontend:/app # 라이브 소스
       - /app/node_modules # 컨테이너 node_modules 보존(호스트가 덮어쓰지 않게)

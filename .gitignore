@@ -20,3 +20,9 @@ backend/static/
 # OS / 에디터
 .DS_Store
 *.log
+
+# 에이전트 개발 툴링 상태 / 개발 저널 — 로컬 전용, 공개 저장소에 포함 안 함
+.omc/
+**/.omc/
+.serena/
+docs/superpowers/
