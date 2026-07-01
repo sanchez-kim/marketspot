@@ -87,7 +87,12 @@ export function SymbolTab() {
                     <span className="wl-chip-sym">{s}</span>
                     {q &&
                       (env?.status === "STALE" ? (
-                        <DataStatusBadge status="STALE" source={env.source} />
+                        <>
+                          <DataStatusBadge status="STALE" source={env.source} />
+                          <span className="muted q-age">
+                            {staleAge(env.asOf, env.delayMinutes)}
+                          </span>
+                        </>
                       ) : (
                         <span className={changeClass(q.changePct)}>
                           {formatPct(q.changePct)}
@@ -118,7 +123,12 @@ export function SymbolTab() {
                     <span className="rail-sym">{s}</span>
                     {q &&
                       (env?.status === "STALE" ? (
-                        <DataStatusBadge status="STALE" source={env.source} />
+                        <>
+                          <DataStatusBadge status="STALE" source={env.source} />
+                          <span className="muted q-age">
+                            {staleAge(env.asOf, env.delayMinutes)}
+                          </span>
+                        </>
                       ) : (
                         <span className={changeClass(q.changePct)}>
                           {formatPct(q.changePct)}

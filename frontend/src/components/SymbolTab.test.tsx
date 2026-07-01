@@ -138,6 +138,10 @@ describe("SymbolTab STALE quote rendering (§0 honesty)", () => {
     expect(screen.getAllByText(/갱신지연/).length).toBeGreaterThan(0);
     const coloredSpans = container.querySelectorAll("span.up, span.down, span.flat");
     expect(coloredSpans.length).toBe(0);
+    // "지연"과 구별되도록 나이("약 N분/시간 전")도 뱃지 옆에 뜬다.
+    const railRow = container.querySelector(".rail-row");
+    expect(railRow).not.toBeNull();
+    expect(railRow!.textContent).toMatch(/분 전|시간 전/);
   });
 
   it("mobile chip: shows STALE badge and no colored changePct for a STALE quote", () => {
@@ -145,6 +149,9 @@ describe("SymbolTab STALE quote rendering (§0 honesty)", () => {
     expect(screen.getAllByText(/갱신지연/).length).toBeGreaterThan(0);
     const coloredSpans = container.querySelectorAll("span.up, span.down, span.flat");
     expect(coloredSpans.length).toBe(0);
+    const chip = container.querySelector(".wl-chip");
+    expect(chip).not.toBeNull();
+    expect(chip!.textContent).toMatch(/분 전|시간 전/);
   });
 });
 
