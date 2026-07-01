@@ -26,7 +26,7 @@ function makeSettings(onboarded: boolean) {
       density: "comfortable",
       upColor: "green",
       defaultPeriod: "1Y",
-      baseCurrency: "USD",
+      baseCurrency: "KRW",
       onboarded,
     },
     apiKeys: {},

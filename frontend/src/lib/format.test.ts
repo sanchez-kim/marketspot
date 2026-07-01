@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { changeClass, formatPct, formLabel, staleAge, statusMeta } from "./format";
+import {
+  changeClass,
+  formatPct,
+  formLabel,
+  staleAge,
+  statusHint,
+  statusMeta,
+} from "./format";
+import { STATUS_GUIDE } from "./helpContent";
 
 describe("statusMeta", () => {
   it("지연은 분 수를 라벨에 포함", () => {
@@ -14,6 +22,49 @@ describe("statusMeta", () => {
     expect(statusMeta("NEEDS_KEY").tone).toBe("warn");
     expect(statusMeta("NO_DATA").tone).toBe("muted");
     expect(statusMeta("ERROR").tone).toBe("error");
+  });
+});
+
+describe("statusHint", () => {
+  it("STALE은 마지막으로 받은 값이라는 뜻을 설명한다(실패라고 단정하지 않음)", () => {
+    expect(statusHint("STALE")).toMatch(/마지막으로 받은 값/);
+    expect(statusHint("STALE")).not.toBe("실패");
+  });
+  it("각 상태마다 서로 다른 뜻 문장을 준다(소스 문자열이 아니라 뜻)", () => {
+    const statuses = [
+      "LIVE",
+      "DELAYED",
+      "STALE",
+      "NO_DATA",
+      "NEEDS_KEY",
+      "RATE_LIMITED",
+      "ERROR",
+    ] as const;
+    const hints = statuses.map((s) => statusHint(s));
+    expect(new Set(hints).size).toBe(statuses.length);
+    hints.forEach((h) => expect(h.length).toBeGreaterThan(0));
+  });
+  it("NEEDS_KEY는 설정에서 키를 넣으라는 안내를 준다", () => {
+    expect(statusHint("NEEDS_KEY")).toMatch(/설정/);
+  });
+
+  it("HelpPanel 범례(STATUS_GUIDE)와 뱃지 툴팁(statusHint) 문구가 어긋나지 않는다", () => {
+    // 두 소스가 같은 뜻 문장을 담으므로, 하나만 바뀌어 드리프트하면 잡는다.
+    const statuses = [
+      "LIVE",
+      "DELAYED",
+      "STALE",
+      "NO_DATA",
+      "NEEDS_KEY",
+      "RATE_LIMITED",
+      "ERROR",
+    ] as const;
+    for (const s of statuses) {
+      const label = statusMeta(s).label;
+      const entry = STATUS_GUIDE.find((g) => g.label === label);
+      expect(entry, `STATUS_GUIDE에 '${label}' 항목이 있어야 함`).toBeDefined();
+      expect(entry?.text).toBe(statusHint(s));
+    }
   });
 });
 

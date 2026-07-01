@@ -53,4 +53,22 @@ describe("DrawdownCard honesty", () => {
     expect(screen.queryByText(/고점 대비 0\.0%/)).not.toBeInTheDocument();
     expect(screen.getByText(/고점 대비 —/)).toBeInTheDocument();
   });
+
+  it("shows a visible '기저율' axis title so beginners can map this card to the 4-axis onboarding", () => {
+    render(<DrawdownCard ctx={base} />);
+    expect(screen.getByText("기저율")).toBeInTheDocument();
+  });
+
+  it("shows exactly one ⓘ glossary marker (no duplicate tooltip between axis title and ticker)", () => {
+    render(<DrawdownCard ctx={base} />);
+    expect(screen.getAllByText("ⓘ")).toHaveLength(1);
+  });
+
+  it("attaches the 기저율 glossary tooltip next to the axis title", () => {
+    render(<DrawdownCard ctx={base} />);
+    const titleEl = screen.getByText("기저율");
+    const glossEl = titleEl.parentElement?.querySelector(".gloss");
+    expect(glossEl).not.toBeNull();
+    expect(glossEl).toHaveAttribute("title", expect.stringContaining("낙폭"));
+  });
 });

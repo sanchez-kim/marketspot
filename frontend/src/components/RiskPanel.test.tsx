@@ -54,6 +54,42 @@ describe("RiskPanel", () => {
     expect(screen.getByText(/보유 포지션이 없습니다/)).toBeInTheDocument();
   });
 
+  it("shows a friendly empty-portfolio guide for NO_DATA without a backend message (not a bug-sounding error)", () => {
+    const empty: PortfolioRisk = {
+      ...data,
+      status: "NO_DATA",
+      concentrationHhi: null,
+      topSymbol: null,
+      topWeight: null,
+      weights: [],
+      correlations: [],
+      avgCorrelation: null,
+      message: null,
+    };
+    render(<RiskPanel data={empty} mode="add" />);
+    expect(screen.getByText(/보유 종목이 없어 아직 볼 게 없어요/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/포트폴리오 탭에서 첫 거래를 기록하면/),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("근거를 불러오지 못했습니다")).not.toBeInTheDocument();
+  });
+
+  it("keeps the generic failure message for a true ERROR status", () => {
+    const errored: PortfolioRisk = {
+      ...data,
+      status: "ERROR",
+      concentrationHhi: null,
+      topSymbol: null,
+      topWeight: null,
+      weights: [],
+      correlations: [],
+      avgCorrelation: null,
+      message: null,
+    };
+    render(<RiskPanel data={errored} mode="add" />);
+    expect(screen.getByText("근거를 불러오지 못했습니다")).toBeInTheDocument();
+  });
+
   it("attaches a glossary tooltip to 집중도(HHI)", () => {
     render(<RiskPanel data={data} mode="add" />);
     const el = screen.getByText(/집중도\(HHI\)/);

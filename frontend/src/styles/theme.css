@@ -1128,6 +1128,13 @@ body {
   font-size: 15px;
   line-height: 1.6;
 }
+.dd-axis {
+  margin-bottom: 6px;
+}
+.dd-axis-title {
+  font-weight: 600;
+  font-size: 14px;
+}
 .dd-head {
   display: flex;
   justify-content: space-between;
@@ -1406,6 +1413,13 @@ body {
 .symbol-name {
   font-size: 19px;
   font-weight: 700;
+}
+.sym-price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+  font-size: 15px;
 }
 .watch-toggle {
   background: var(--bg-elev);
@@ -1927,6 +1941,15 @@ body {
   font-weight: 700;
   font-size: 16px;
 }
+.review-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.review-label {
+  font-size: 12px;
+  color: var(--text-dim);
+}
 .review-toggle {
   display: inline-flex;
   gap: 2px;
@@ -2061,7 +2084,8 @@ body {
   letter-spacing: 0.06em;
 }
 .help-tab-list,
-.help-axis-list {
+.help-axis-list,
+.help-status-list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -2070,21 +2094,24 @@ body {
   gap: 10px;
 }
 .help-tab-item,
-.help-axis-item {
+.help-axis-item,
+.help-status-item {
   display: flex;
   gap: 14px;
   font-size: 14px;
   line-height: 1.6;
 }
 .help-tab-name,
-.help-axis-title {
+.help-axis-title,
+.help-status-label {
   font-weight: 600;
   color: var(--text);
   flex-shrink: 0;
   min-width: 96px;
 }
 .help-tab-text,
-.help-axis-text {
+.help-axis-text,
+.help-status-text {
   color: var(--text-dim);
 }
 /* 용어 미니 사전 */

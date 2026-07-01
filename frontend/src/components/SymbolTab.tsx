@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api/client";
-import { changeClass, formatPct } from "../lib/format";
+import { changeClass, formatPct, formatPrice, staleAge } from "../lib/format";
 import { DataStatusBadge } from "./DataStatusBadge";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { useSettings, useUpdateSettings } from "../hooks/useSettings";
@@ -87,7 +87,12 @@ export function SymbolTab() {
                     <span className="wl-chip-sym">{s}</span>
                     {q &&
                       (env?.status === "STALE" ? (
-                        <DataStatusBadge status="STALE" source={env.source} />
+                        <>
+                          <DataStatusBadge status="STALE" source={env.source} />
+                          <span className="muted q-age">
+                            {staleAge(env.asOf, env.delayMinutes)}
+                          </span>
+                        </>
                       ) : (
                         <span className={changeClass(q.changePct)}>
                           {formatPct(q.changePct)}
@@ -118,7 +123,12 @@ export function SymbolTab() {
                     <span className="rail-sym">{s}</span>
                     {q &&
                       (env?.status === "STALE" ? (
-                        <DataStatusBadge status="STALE" source={env.source} />
+                        <>
+                          <DataStatusBadge status="STALE" source={env.source} />
+                          <span className="muted q-age">
+                            {staleAge(env.asOf, env.delayMinutes)}
+                          </span>
+                        </>
                       ) : (
                         <span className={changeClass(q.changePct)}>
                           {formatPct(q.changePct)}
@@ -135,6 +145,28 @@ export function SymbolTab() {
       <div className="symbol-detail">
         <div className="symbol-detail-head">
           <span className="symbol-name">{symbol}</span>
+          {(() => {
+            const env = quotes.data?.[symbol.toUpperCase()];
+            const q = env?.data;
+            if (!env || !q) return null;
+            return (
+              <span className="sym-price">
+                <b>{formatPrice(q.price)}</b>
+                {env.status === "STALE" ? (
+                  <span className="quote-stale">
+                    <DataStatusBadge status="STALE" source={env.source} />
+                    <span className="muted q-age">
+                      {staleAge(env.asOf, env.delayMinutes)}
+                    </span>
+                  </span>
+                ) : (
+                  <span className={changeClass(q.changePct)}>
+                    {formatPct(q.changePct)}
+                  </span>
+                )}
+              </span>
+            );
+          })()}
           <button
             className={`watch-toggle ${isWatched ? "on" : ""}`}
             onClick={toggleWatch}
@@ -148,22 +180,33 @@ export function SymbolTab() {
         <div className="briefing">
           <div className="briefing-head">
             <span className="briefing-title">살펴보기 · {symbol}</span>
-            <div className="review-toggle" role="group" aria-label="검토 모드">
-              {(
-                [
-                  ["add", "추가매수"],
-                  ["hold", "보유점검"],
-                  ["new", "신규편입"],
-                ] as const
-              ).map(([m, label]) => (
-                <button
-                  key={m}
-                  className={reviewMode === m ? "rt on" : "rt"}
-                  onClick={() => setReviewMode(m)}
+            <div className="review-group">
+              <span className="review-label">
+                관점
+                <span
+                  className="gloss"
+                  title="이 종목을 어떤 상황으로 볼지 — 아래 '포트폴리오 영향'의 강조점이 바뀌어요."
                 >
-                  {label}
-                </button>
-              ))}
+                  <sup className="gloss-i">ⓘ</sup>
+                </span>
+              </span>
+              <div className="review-toggle" role="group" aria-label="검토 모드">
+                {(
+                  [
+                    ["add", "추가매수"],
+                    ["hold", "보유점검"],
+                    ["new", "신규편입"],
+                  ] as const
+                ).map(([m, label]) => (
+                  <button
+                    key={m}
+                    className={reviewMode === m ? "rt on" : "rt"}
+                    onClick={() => setReviewMode(m)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
           <div className="ev-grid">

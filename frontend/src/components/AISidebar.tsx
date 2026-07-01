@@ -20,8 +20,23 @@ const HAS_DATA = ["LIVE", "DELAYED", "STALE"];
 function buildIntro(
   symbol: string,
   ctx: DrawdownContext | undefined,
+  onSymbolTab: boolean,
 ): { greeting: string; chips: string[] } {
   const chips: string[] = [];
+
+  if (!onSymbolTab) {
+    // 살펴보기 탭 밖에서는 사용자가 고른 적 없는 종목(symbol 기본값 등)을
+    // 언급하지 않는다 — §0 정직성. 중립 인사만 보여준다.
+    chips.push("PER이 무슨 뜻이야?");
+    chips.push("기저율은 어떻게 읽어?");
+    return {
+      greeting:
+        "무엇이든 물어보세요 — 용어·숫자·근거를 쉬운 말로 풀어드려요. " +
+        "특정 종목을 보려면 '살펴보기' 탭에서 골라주세요.",
+      chips: chips.slice(0, 4),
+    };
+  }
+
   const dd = ctx && HAS_DATA.includes(ctx.status) ? ctx.currentDrawdownPct : null;
 
   let ddContext = "";
@@ -61,6 +76,7 @@ export function AISidebar() {
     setLastAiBackend,
     clearAi,
     symbol,
+    activeTab,
   } = useUIStore();
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
@@ -95,7 +111,7 @@ export function AISidebar() {
 
   if (!aiOpen) return null;
 
-  const intro = buildIntro(symbol, ctx.data);
+  const intro = buildIntro(symbol, ctx.data, activeTab === "symbol");
 
   const send = async (q: string) => {
     const text = q.trim();

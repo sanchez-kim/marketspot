@@ -27,6 +27,23 @@ export function statusMeta(
   return base;
 }
 
+// 뱃지 title(툴팁)용 뜻풀이. 소스 문자열이 아니라 "무슨 뜻인지"를 전달해야
+// 초보 투자자가 상태를 오해하지 않는다(§0 정직성). HelpPanel의 STATUS_GUIDE와
+// 같은 문구를 쓴다 — 뱃지에 손을 올렸을 때와 도움말을 열었을 때 같은 설명을 본다.
+const STATUS_HINT: Record<DataStatus, string> = {
+  LIVE: "지금 시각의 시세예요.",
+  DELAYED: "무료 데이터라 몇 분 지연된 값이에요(판단엔 무방).",
+  STALE: "실시간 갱신이 안 돼 마지막으로 받은 값을 보여줘요(오래됐을 수 있어요).",
+  NO_DATA: "해당 종목·항목의 데이터가 없어요(가짜로 채우지 않아요).",
+  NEEDS_KEY: "무료 키를 ⚙ 설정에 넣으면 보여요.",
+  RATE_LIMITED: "데이터 제공처 호출 한도에 걸렸어요. 잠시 후 다시.",
+  ERROR: "일시적으로 조회에 실패했어요.",
+};
+
+export function statusHint(status: DataStatus): string {
+  return STATUS_HINT[status];
+}
+
 // ── 공유 포트폴리오 포맷터 ────────────────────────────────────────
 // PortfolioTab(데스크톱 표)과 PositionCard(폰 카드)가 공유한다.
 // 가짜 숫자 금지: null → "—", 부호 표기 포함.
