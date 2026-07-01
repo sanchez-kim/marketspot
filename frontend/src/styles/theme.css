@@ -2068,7 +2068,8 @@ body {
   letter-spacing: 0.06em;
 }
 .help-tab-list,
-.help-axis-list {
+.help-axis-list,
+.help-status-list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -2077,21 +2078,24 @@ body {
   gap: 10px;
 }
 .help-tab-item,
-.help-axis-item {
+.help-axis-item,
+.help-status-item {
   display: flex;
   gap: 14px;
   font-size: 14px;
   line-height: 1.6;
 }
 .help-tab-name,
-.help-axis-title {
+.help-axis-title,
+.help-status-label {
   font-weight: 600;
   color: var(--text);
   flex-shrink: 0;
   min-width: 96px;
 }
 .help-tab-text,
-.help-axis-text {
+.help-axis-text,
+.help-status-text {
   color: var(--text-dim);
 }
 /* 용어 미니 사전 */

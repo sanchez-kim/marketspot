@@ -18,4 +18,22 @@ describe("HelpPanel", () => {
     expect(useUIStore.getState().helpOpen).toBe(false);
     expect(useUIStore.getState().tourOpen).toBe(true);
   });
+
+  it("explains all 7 DataStatus badge meanings (honesty backbone)", () => {
+    act(() => useUIStore.setState({ helpOpen: true, tourOpen: false }));
+    render(<HelpPanel />);
+    expect(screen.getByText("데이터 상태 표시")).toBeInTheDocument();
+    // 라벨 7개 모두 노출
+    [
+      "실시간",
+      "지연",
+      "갱신지연",
+      "데이터 없음",
+      "API 키 필요",
+      "호출 제한",
+      "오류",
+    ].forEach((label) => expect(screen.getByText(label)).toBeInTheDocument());
+    // STALE(갱신지연)은 "실패"가 아니라 마지막으로 받은 값이라는 정직한 설명
+    expect(screen.getByText(/마지막으로 받은 값/)).toBeInTheDocument();
+  });
 });

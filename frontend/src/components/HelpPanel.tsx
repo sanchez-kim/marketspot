@@ -1,4 +1,4 @@
-import { APP_INTRO, AXIS_GUIDE, TAB_GUIDE } from "../lib/helpContent";
+import { APP_INTRO, AXIS_GUIDE, STATUS_GUIDE, TAB_GUIDE } from "../lib/helpContent";
 import { GLOSSARY, GLOSSARY_LABELS } from "../lib/glossary";
 import { useUIStore } from "../store/uiStore";
 
@@ -59,6 +59,19 @@ export function HelpPanel() {
                 <li key={title} className="help-axis-item">
                   <span className="help-axis-title">{title}</span>
                   <span className="help-axis-text">{text}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          {/* 데이터 상태 표시 */}
+          <section className="help-section">
+            <h3 className="help-section-title">데이터 상태 표시</h3>
+            <ul className="help-status-list">
+              {STATUS_GUIDE.map(({ label, text }) => (
+                <li key={label} className="help-status-item">
+                  <span className="help-status-label">{label}</span>
+                  <span className="help-status-text">{text}</span>
                 </li>
               ))}
             </ul>
