@@ -23,7 +23,7 @@ describe("TransactionForm", () => {
     renderForm();
     // Fill quantity and price via aria-labels
     fireEvent.change(screen.getByLabelText(/수량/), { target: { value: "9" } });
-    fireEvent.change(screen.getByLabelText(/가격/), { target: { value: "120" } });
+    fireEvent.change(screen.getByLabelText("1주당 가격"), { target: { value: "120" } });
     // The test seam: set symbol via data-testid hidden input (see TransactionForm.tsx)
     fireEvent.change(screen.getByTestId("txn-symbol"), { target: { value: "AAPL" } });
     // Click the submit button (unique data-testid to avoid matching toggle buttons)
@@ -58,12 +58,20 @@ describe("TransactionForm", () => {
     renderForm(onAdded);
 
     fireEvent.change(screen.getByLabelText(/수량/), { target: { value: "5" } });
-    fireEvent.change(screen.getByLabelText(/가격/), { target: { value: "100" } });
+    fireEvent.change(screen.getByLabelText("1주당 가격"), { target: { value: "100" } });
     fireEvent.change(screen.getByTestId("txn-symbol"), { target: { value: "AAPL" } });
     fireEvent.click(screen.getByTestId("txn-submit"));
 
     await waitFor(() => expect(onAdded).toHaveBeenCalledWith(mockSummary));
     // Form should reset: quantity should be empty
     expect((screen.getByLabelText(/수량/) as HTMLInputElement).value).toBe("");
+  });
+
+  it("displays per-share price label and optional date label", () => {
+    renderForm();
+    // Verify price input has clear per-share label
+    expect(screen.getByLabelText("1주당 가격")).toBeInTheDocument();
+    // Verify date input has optional marker
+    expect(screen.getByLabelText("날짜 (선택)")).toBeInTheDocument();
   });
 });

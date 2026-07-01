@@ -127,7 +127,7 @@ export function TransactionForm({ onAdded }: Props) {
       <input
         className="wl-input"
         type="date"
-        aria-label="날짜"
+        aria-label="날짜 (선택)"
         value={date}
         onChange={(e) => setDate(e.target.value)}
       />
@@ -149,8 +149,8 @@ export function TransactionForm({ onAdded }: Props) {
         <input
           className="wl-input"
           type="number"
-          aria-label="가격"
-          placeholder="가격"
+          aria-label="1주당 가격"
+          placeholder="1주당 가격"
           inputMode="decimal"
           min="0"
           value={price}
