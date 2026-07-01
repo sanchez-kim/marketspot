@@ -15,8 +15,8 @@ services:
     environment:
       # 호스트 Ollama 재사용 (qwen3-vl:8b 이미 받아둔 것).
       OLLAMA_HOST: http://host.docker.internal:11434
-      # SEC 공시 호출용 연락처 포함 User-Agent (예의상 권장).
-      SEC_USER_AGENT: "MarketSpot/0.1 (local dev; sanchez.kim.kr@gmail.com)"
+      # SEC 공시 호출용 연락처 포함 User-Agent (.env 의 SEC_USER_AGENT 로 덮어쓰기 가능).
+      SEC_USER_AGENT: "${SEC_USER_AGENT:-MarketSpot/0.1 (self-host; contact: you@example.com)}"
       STOCK_TERMINAL_DATA_DIR: /app/data
       # macOS 볼륨 마운트에서 파일변경 감지를 확실히 하려고 폴링 강제.
       WATCHFILES_FORCE_POLLING: "true"
