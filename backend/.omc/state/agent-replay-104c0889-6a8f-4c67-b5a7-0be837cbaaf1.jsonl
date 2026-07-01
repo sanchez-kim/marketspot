@@ -1,2 +1,0 @@
-{"t":0,"agent":"a3f6dbc","agent_type":"unknown","event":"agent_stop","success":true,"duration_ms":0}
-{"t":0,"agent":"system","event":"skill_invoked","skill_name":"superpowers:subagent-driven-development"}
