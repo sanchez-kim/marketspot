@@ -17,7 +17,12 @@ function renderSidebar() {
 
 describe("AISidebar explainer tone", () => {
   beforeEach(() => {
-    useUIStore.setState({ aiOpen: true, aiMessages: [], symbol: "VOO" });
+    useUIStore.setState({
+      aiOpen: true,
+      aiMessages: [],
+      symbol: "VOO",
+      activeTab: "symbol",
+    });
   });
   it("opens with an explainer intro (not a do-nothing reassurance)", () => {
     renderSidebar();
@@ -30,6 +35,7 @@ describe("AISidebar explainer tone", () => {
     useUIStore.setState({
       aiOpen: true,
       symbol: "VOO",
+      activeTab: "symbol",
       aiMessages: [
         { role: "user", text: "PER이 뭐야?" },
         { role: "assistant", text: "주가수익비율…", backend: "rule" },
@@ -37,6 +43,38 @@ describe("AISidebar explainer tone", () => {
     });
     renderSidebar();
     expect(screen.getByText(/규칙 기반으로 동작 중/)).toBeInTheDocument();
+  });
+});
+
+describe("AISidebar greeting depends on active tab (§0 honesty — no unpicked ticker)", () => {
+  afterEach(() => {
+    // restore default so other describe blocks aren't affected by tab bleed
+    useUIStore.setState({ activeTab: "home" });
+  });
+
+  it("uses a neutral, ticker-free greeting when NOT on the 살펴보기(symbol) tab", () => {
+    useUIStore.setState({
+      aiOpen: true,
+      aiMessages: [],
+      symbol: "VOO",
+      activeTab: "home",
+    });
+    renderSidebar();
+    // must not mention the default/leftover ticker as if the user picked it
+    expect(screen.queryByText(/VOO/)).not.toBeInTheDocument();
+    // neutral copy pointing the user to the 살펴보기 tab
+    expect(screen.getByText(/살펴보기/)).toBeInTheDocument();
+  });
+
+  it("keeps the existing symbol-specific greeting when on the 살펴보기(symbol) tab", () => {
+    useUIStore.setState({
+      aiOpen: true,
+      aiMessages: [],
+      symbol: "VOO",
+      activeTab: "symbol",
+    });
+    renderSidebar();
+    expect(screen.getAllByText(/VOO/).length).toBeGreaterThan(0);
   });
 });
 
