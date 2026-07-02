@@ -32,6 +32,9 @@ class ApiKeys(CamelModel):
     fred: str = ""
     kis: str = ""
     gemini: str = ""
+    # 토스증권 Open API (OAuth2 client_credentials — app key/secret 쌍)
+    toss_app_key: str = ""
+    toss_app_secret: str = ""
 
 
 class AISettings(CamelModel):
@@ -98,6 +101,7 @@ class SafeApiKeys(CamelModel):
     fred: bool = False
     kis: bool = False
     gemini: bool = False
+    toss: bool = False  # app key/secret 둘 다 설정됐을 때 true
 
 
 class SafeSettings(CamelModel):
@@ -142,6 +146,7 @@ def to_safe(settings: Settings) -> SafeSettings:
             fred=bool(keys.fred),
             kis=bool(keys.kis),
             gemini=bool(keys.gemini),
+            toss=bool(keys.toss_app_key and keys.toss_app_secret),
         ),
         ai=settings.ai,
         ui=settings.ui,
