@@ -1,0 +1,27 @@
+# MarketSpot 프로덕션(로컬 생산성 모드) — 단일 컨테이너 구성.
+#   docker compose -f docker-compose.prod.yml up --build
+# 빌드된 프론트+API 를 :8000 하나로 서빙. 코드 변경 시 --build 로 재빌드 필요
+# (라이브 리로드 없음 — 개발은 기존 docker compose up 사용).
+# 호스트 바인딩은 127.0.0.1(로컬 전용) — 무인증 앱의 안전 기본값(dev 와 동일 원칙).
+name: marketspot-prod
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - ./backend/data:/app/data # 설정·포트폴리오 영속(데이터만 — 소스 마운트 없음)
+    environment:
+      OLLAMA_HOST: http://host.docker.internal:11434
+      SEC_USER_AGENT: "${SEC_USER_AGENT:-MarketSpot/0.1 (self-host; contact: you@example.com)}"
+      STOCK_TERMINAL_DATA_DIR: /app/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

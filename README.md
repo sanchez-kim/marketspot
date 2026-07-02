@@ -40,6 +40,17 @@ docker compose down         # 중지
 ollama pull qwen3.5:9b-mlx   # 기본 모델(애플 실리콘 MLX, Ollama 0.30+)
 ```
 
+### 프로덕션 모드 (로컬 상시 실행용)
+
+빌드된 프론트+백엔드를 단일 컨테이너(:8000)로 서빙한다 — `--reload`/HMR 없이 가볍고 빠르다.
+
+```bash
+docker compose -f docker-compose.prod.yml up --build -d
+# → http://127.0.0.1:8000 (프론트+API 통합)
+```
+
+코드 변경은 자동 반영되지 않는다 — 수정 후 `--build`로 재빌드. 개발 중엔 기존 `docker compose up`(핫리로드)을 사용.
+
 ### 대안: 로컬 직접 실행
 ```bash
 # 백엔드 (Python 3.11+; SEC 공시 호출 시 연락처 포함 User-Agent 권장)
