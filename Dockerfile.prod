@@ -1,0 +1,35 @@
+# MarketSpot 프로덕션(로컬 생산성 모드) — 단일 컨테이너.
+# Stage 1에서 프론트를 빌드하고, Stage 2의 백엔드가 ./static 으로 함께 서빙한다
+# (backend/app/main.py 의 FRONTEND_DIST 마운트가 ./static 을 자동 인식).
+# 빌드 컨텍스트는 저장소 루트: docker compose -f docker-compose.prod.yml up --build
+
+# ── Stage 1: 프론트 빌드 ─────────────────────────────────────────
+FROM node:22-slim AS frontend-build
+WORKDIR /build
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+COPY frontend/ ./
+RUN npm run build
+
+# ── Stage 2: 백엔드 런타임 (+ 정적 프론트) ───────────────────────
+FROM python:3.14-slim
+ENV PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+WORKDIR /app
+
+# healthcheck 용 curl
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY backend/pyproject.toml ./
+COPY backend/app ./app
+# 런타임 의존성만(data). dev extras(pytest/ruff/mypy)는 이미지에 넣지 않는다.
+RUN pip install ".[data]"
+
+# 빌드된 프론트 → main.py 의 FRONTEND_DIST 기본값(./static)과 일치
+COPY --from=frontend-build /build/dist ./static
+
+EXPOSE 8000
+# --reload 없음(dev 와의 핵심 차이) — 코드 변경 시 이미지 재빌드 필요.
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
