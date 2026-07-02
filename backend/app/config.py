@@ -32,6 +32,9 @@ class ApiKeys(CamelModel):
     fred: str = ""
     kis: str = ""
     gemini: str = ""
+    # 토스증권 Open API (OAuth2 client_credentials — app key/secret 쌍)
+    toss_app_key: str = ""
+    toss_app_secret: str = ""
 
 
 class AISettings(CamelModel):
@@ -87,6 +90,10 @@ class Settings(CamelModel):
     ui: UISettings = Field(default_factory=UISettings)
     plan: PlanSettings = Field(default_factory=PlanSettings)
     dashboard: DashboardLayout = Field(default_factory=DashboardLayout)
+    # 토스증권 연동(Phase A): 선택 계좌 seq + 마지막 증분 동기화 시각(ISO).
+    # accountSeq 는 비밀이 아니므로 마스킹하지 않고 그대로 노출한다.
+    toss_account_seq: str = ""
+    toss_last_sync: str = ""
 
 
 class SafeApiKeys(CamelModel):
@@ -98,6 +105,7 @@ class SafeApiKeys(CamelModel):
     fred: bool = False
     kis: bool = False
     gemini: bool = False
+    toss: bool = False  # app key/secret 둘 다 설정됐을 때 true
 
 
 class SafeSettings(CamelModel):
@@ -110,6 +118,9 @@ class SafeSettings(CamelModel):
     ui: UISettings
     plan: PlanSettings
     dashboard: DashboardLayout
+    # 계좌 seq/동기화 시각은 비밀이 아니므로 그대로 노출(프론트 카드 상태 표시용).
+    toss_account_seq: str = ""
+    toss_last_sync: str = ""
 
 
 def load_settings() -> Settings:
@@ -142,9 +153,34 @@ def to_safe(settings: Settings) -> SafeSettings:
             fred=bool(keys.fred),
             kis=bool(keys.kis),
             gemini=bool(keys.gemini),
+            toss=bool(keys.toss_app_key and keys.toss_app_secret),
         ),
         ai=settings.ai,
         ui=settings.ui,
         plan=settings.plan,
         dashboard=settings.dashboard,
+        toss_account_seq=settings.toss_account_seq,
+        toss_last_sync=settings.toss_last_sync,
     )
+
+
+# ---- 토스 동기화 상태 접근자 (services/toss_sync 주입용) ----------------------
+
+
+def get_toss_last_sync() -> str:
+    """마지막 증분 동기화 시각(ISO 문자열, 없으면 빈 문자열)."""
+    return load_settings().toss_last_sync
+
+
+def set_toss_last_sync(value: str) -> None:
+    """증분 동기화 완료 시각을 저장(다른 설정은 보존)."""
+    settings = load_settings()
+    settings.toss_last_sync = value
+    save_settings(settings)
+
+
+def set_toss_account_seq(account_seq: str) -> None:
+    """선택 계좌 seq 저장(다른 설정은 보존)."""
+    settings = load_settings()
+    settings.toss_account_seq = account_seq
+    save_settings(settings)

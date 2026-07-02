@@ -33,7 +33,11 @@ describe("SettingsPanel", () => {
 
   it("shows set/unset status per key", () => {
     renderPanel({ fred: false, dart: true });
-    expect(screen.getByText("미설정")).toBeInTheDocument(); // FRED unset
+    // FRED unset — scope to its own label so the (also-unset-by-default) Toss
+    // field's "미설정" badge doesn't collide.
+    expect(
+      screen.getByLabelText("FRED 키").closest(".settings-field"),
+    ).toHaveTextContent("미설정");
     expect(screen.getByText(/설정됨/)).toBeInTheDocument(); // DART set
   });
 
@@ -50,6 +54,34 @@ describe("SettingsPanel", () => {
     });
     await waitFor(() =>
       expect(spy).toHaveBeenCalledWith({ apiKeys: { fred: "MY_FRED_KEY" } }),
+    );
+  });
+
+  it("renders Toss key inputs with status badge reflecting keys.toss", () => {
+    renderPanel({ fred: false, dart: false, toss: true });
+    expect(screen.getByLabelText("토스증권 앱 키")).toBeInTheDocument();
+    expect(screen.getByLabelText("토스증권 시크릿")).toBeInTheDocument();
+    expect(screen.getByText(/설정됨/)).toBeInTheDocument();
+  });
+
+  it("saves toss_app_key/toss_app_secret in the patch when filled", async () => {
+    const spy = vi.spyOn(api, "updateSettings").mockResolvedValue({
+      apiKeys: { fred: false, dart: false, toss: true },
+    } as unknown as SafeSettings);
+    renderPanel({ fred: false, dart: false, toss: false });
+    fireEvent.change(screen.getByLabelText("토스증권 앱 키"), {
+      target: { value: "MY_APP_KEY" },
+    });
+    fireEvent.change(screen.getByLabelText("토스증권 시크릿"), {
+      target: { value: "MY_SECRET" },
+    });
+    act(() => {
+      fireEvent.click(screen.getByRole("button", { name: /저장/ }));
+    });
+    await waitFor(() =>
+      expect(spy).toHaveBeenCalledWith({
+        apiKeys: { toss_app_key: "MY_APP_KEY", toss_app_secret: "MY_SECRET" },
+      }),
     );
   });
 });

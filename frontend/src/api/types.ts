@@ -205,6 +205,38 @@ export interface Transaction {
   quantity: number;
   price: number;
   currency: string;
+  source?: string; // "manual" | "toss" | "toss-baseline"
+  externalId?: string | null;
+  fee?: number | null;
+  tax?: number | null;
+}
+
+// ── 토스증권 연동 ─────────────────────────────────────────────────────
+export interface TossAccountInfo {
+  accountSeq: string;
+  accountNo: string;
+  accountType: string | null;
+  label: string;
+}
+
+export interface TossStatus {
+  connected: boolean;
+  accounts: TossAccountInfo[];
+  selectedAccountSeq: string | null;
+  lastSync: string | null;
+}
+
+export interface DriftWarning {
+  symbol: string;
+  appQty: number;
+  tossQty: number;
+}
+
+export interface TossSyncResult {
+  mode: "bootstrap" | "incremental";
+  added: number;
+  skippedUnpriced: number;
+  drift: DriftWarning[];
 }
 
 // ── 안심 레이어 ─────────────────────────────────────────────────────

@@ -13,6 +13,8 @@ export function SettingsPanel() {
   const update = useUpdateSettings();
   const [fred, setFred] = useState("");
   const [dart, setDart] = useState("");
+  const [tossAppKey, setTossAppKey] = useState("");
+  const [tossAppSecret, setTossAppSecret] = useState("");
   const [saved, setSaved] = useState(false);
 
   if (!settingsOpen) return null;
@@ -29,6 +31,8 @@ export function SettingsPanel() {
     const patch: Record<string, string> = {};
     if (fred.trim()) patch.fred = fred.trim();
     if (dart.trim()) patch.dart = dart.trim();
+    if (tossAppKey.trim()) patch.toss_app_key = tossAppKey.trim();
+    if (tossAppSecret.trim()) patch.toss_app_secret = tossAppSecret.trim();
     if (Object.keys(patch).length === 0) return;
     update.mutate(
       { apiKeys: patch },
@@ -36,6 +40,8 @@ export function SettingsPanel() {
         onSuccess: () => {
           setFred("");
           setDart("");
+          setTossAppKey("");
+          setTossAppSecret("");
           setSaved(true);
         },
       },
@@ -103,6 +109,36 @@ export function SettingsPanel() {
           <span className="settings-link">무료 발급: opendart.fss.or.kr</span>
         </div>
 
+        <div className="settings-field">
+          <label htmlFor="toss-app-key">
+            토스증권 <span className="settings-hint">보유·거래내역 자동 동기화</span>{" "}
+            {status(!!keys.toss)}
+          </label>
+          <input
+            id="toss-app-key"
+            type="password"
+            aria-label="토스증권 앱 키"
+            placeholder={keys.toss ? "새 앱 키 입력 (비우면 유지)" : "앱 키 입력"}
+            value={tossAppKey}
+            onChange={(e) => {
+              setTossAppKey(e.target.value);
+              setSaved(false);
+            }}
+          />
+          <input
+            id="toss-app-secret"
+            type="password"
+            aria-label="토스증권 시크릿"
+            placeholder={keys.toss ? "새 시크릿 입력 (비우면 유지)" : "시크릿 입력"}
+            value={tossAppSecret}
+            onChange={(e) => {
+              setTossAppSecret(e.target.value);
+              setSaved(false);
+            }}
+          />
+          <span className="settings-link">토스증권 개발자 센터에서 발급</span>
+        </div>
+
         <p className="settings-note">
           AI 도우미(Ollama) 주소는 환경변수 <code>OLLAMA_HOST</code> 로 설정해요(기본
           http://localhost:11434).
@@ -113,7 +149,13 @@ export function SettingsPanel() {
           <button
             className="settings-save"
             onClick={save}
-            disabled={update.isPending || (!fred.trim() && !dart.trim())}
+            disabled={
+              update.isPending ||
+              (!fred.trim() &&
+                !dart.trim() &&
+                !tossAppKey.trim() &&
+                !tossAppSecret.trim())
+            }
           >
             {update.isPending ? "저장 중…" : "저장"}
           </button>
