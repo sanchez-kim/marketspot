@@ -8,6 +8,7 @@ provider 체인과 서비스 싱글톤을 만든다. 키가 필요한 제공자(
 from __future__ import annotations
 
 import os
+from collections.abc import Callable
 from functools import lru_cache
 
 from .config import load_settings
@@ -23,6 +24,7 @@ from .providers.last_good import LastGoodStore
 from .providers.macro_provider import FredMacroProvider
 from .providers.registry import ProviderRegistry
 from .providers.search_provider import SearchProvider, YahooSearchProvider
+from .providers.toss_client import TossClient
 from .providers.yfinance_provider import YFinanceProvider
 from .services.chart import ChartService
 from .services.conditions import MacroConditionsService
@@ -36,6 +38,7 @@ from .services.quotes import QuoteService
 from .services.reassurance import ReassuranceService
 from .services.risk import RiskService
 from .services.spark import SparkService
+from .services.toss_sync import TossSyncService
 from .services.valuation import ValuationService
 
 
@@ -146,6 +149,30 @@ def get_valuation_service() -> ValuationService:
     return ValuationService(get_fundamentals_provider(), get_registry())
 
 
+@lru_cache(maxsize=1)
+def get_toss_client_factory() -> Callable[[], TossClient]:
+    """토스 app key/secret 를 캡처한 클라이언트 팩토리.
+
+    키를 생성 시점에 한 번 읽어(캡처) 팩토리에 담는다 — 그래서 키가 바뀌면
+    ``reset_service_caches()`` 로 이 캐시를 비워야 새 키가 반영된다(★ 아래 계약).
+    팩토리는 호출마다 **새 클라이언트**를 만든다: 토큰 단일 관리자를 동기화
+    작업(메서드) 단위로 격리해 1토큰 제약을 안전하게 지킨다.
+    """
+    keys = load_settings().api_keys
+    app_key = keys.toss_app_key
+    app_secret = keys.toss_app_secret
+
+    def factory() -> TossClient:
+        return TossClient(app_key, app_secret)
+
+    return factory
+
+
+@lru_cache(maxsize=1)
+def get_toss_sync_service() -> TossSyncService:
+    return TossSyncService(get_toss_client_factory())
+
+
 def reset_service_caches() -> None:
     """설정(특히 API 키) 변경 후 키를 캡처해 둔 서비스 캐시를 비운다.
 
@@ -157,3 +184,7 @@ def reset_service_caches() -> None:
     """
     get_conditions_service.cache_clear()
     get_filings_service.cache_clear()
+    # 토스 팩토리는 app key/secret 를 캡처한다 → 키 변경 시 재생성 필요.
+    # sync 서비스는 팩토리를 들고 있으므로 함께 비운다.
+    get_toss_client_factory.cache_clear()
+    get_toss_sync_service.cache_clear()

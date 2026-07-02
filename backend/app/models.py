@@ -212,7 +212,14 @@ class FilingList(CamelModel):
 
 
 class Transaction(CamelModel):
-    """사용자 거래(체결) 기록 — 매수/매도 1건."""
+    """사용자 거래(체결) 기록 — 매수/매도 1건.
+
+    ``source``/``external_id``/``fee``/``tax`` 는 토스증권 연동(Phase A)에서
+    추가됐다. 기존 저장 데이터에는 없으므로 **기본값으로 하위호환**한다:
+    수동 입력분은 ``source="manual"``, 브로커 동기화분은 ``source="toss"``
+    (부트스트랩 스냅샷은 ``"toss-baseline"``). ``external_id`` 는 멱등 동기화
+    키(주문 orderId / baseline 키)로 중복 import 를 막는다.
+    """
 
     id: str
     date: str | None  # ISO YYYY-MM-DD. 마이그레이션분은 None("기초 보유")
@@ -221,6 +228,10 @@ class Transaction(CamelModel):
     quantity: float
     price: float  # 1주당 체결가(해당 종목 통화 기준)
     currency: str  # "USD" | "KRW"
+    source: str = "manual"  # manual | toss | toss-baseline
+    external_id: str | None = None  # 동기화 멱등 키(orderId / baseline 키)
+    fee: float | None = None  # 수수료(체결 통화 기준)
+    tax: float | None = None  # 세금(체결 통화 기준)
 
 
 class Position(CamelModel):
@@ -474,3 +485,54 @@ class HomeVerdict(CamelModel):
     total_pnl_pct: float | None = None
     context: DrawdownContext | None = None  # 근거가 된 종목의 하락 맥락
     as_of: datetime | None = None
+
+
+# ---- 토스증권 연동 (Phase A) -------------------------------------------------
+
+
+class TossAccountInfo(CamelModel):
+    """상태 응답에 실을 계좌 표시 정보(원시 TossAccount 를 프론트용으로 조합).
+
+    토스 스펙에 표시용 ``name`` 이 없어(§0 지어내지 않음) accountType·accountNo
+    로 ``label`` 을 조합한다. ``account_seq`` 는 문자열로 노출(settings 형식과 일치).
+    """
+
+    account_seq: str
+    account_no: str
+    account_type: str | None = None
+    label: str
+
+
+class TossStatus(CamelModel):
+    """``GET /api/toss/status`` 의 데이터 본문(연동돼 있을 때)."""
+
+    connected: bool
+    accounts: list[TossAccountInfo] = []
+    selected_account_seq: str | None = None
+    last_sync: str | None = None
+
+
+class DriftWarning(CamelModel):
+    """파생 포지션 수량 vs 토스 실잔고 불일치(정직성 — 숨기지 않고 표기).
+
+    ``app_qty`` 는 거래내역 fold 로 도출한 수량, ``toss_qty`` 는 토스 holdings
+    실수량. 동기화 밖 거래(다른 도구·소급 한도 밖)를 드러낸다.
+    """
+
+    symbol: str
+    app_qty: float
+    toss_qty: float
+
+
+class TossSyncResult(CamelModel):
+    """``POST /api/toss/sync`` 결과 요약.
+
+    ``mode`` 는 최초 연동(bootstrap) / 증분(incremental). ``added`` 는 새로
+    삽입된 거래 수. ``skipped_unpriced`` 는 체결됐으나 체결가가 없어 (가짜값을
+    만들지 않고) 건너뛴 주문 수(§0). ``drift`` 는 잔고 대조 경고.
+    """
+
+    mode: Literal["bootstrap", "incremental"]
+    added: int
+    skipped_unpriced: int = 0
+    drift: list[DriftWarning] = []
