@@ -25,6 +25,7 @@ from .providers.macro_provider import FredMacroProvider
 from .providers.registry import ProviderRegistry
 from .providers.search_provider import SearchProvider, YahooSearchProvider
 from .providers.toss_client import TossClient
+from .providers.toss_provider import TossQuoteProvider
 from .providers.yfinance_provider import YFinanceProvider
 from .services.chart import ChartService
 from .services.conditions import MacroConditionsService
@@ -44,9 +45,21 @@ from .services.valuation import ValuationService
 
 def build_registry() -> ProviderRegistry:
     yf = YFinanceProvider()
-    # MVP: 미국/한국 모두 yfinance 기본. KIS/Alpaca 는 키 연동 시 앞단에 추가.
+    # MVP: 미국은 yfinance 기본. KIS/Alpaca 는 키 연동 시 앞단에 추가.
     us_chain: list[QuoteProvider] = [yf]
-    kr_chain: list[QuoteProvider] = [yf]
+    # 토스는 항상 KR 체인 맨 앞에 둔다(키 유무와 무관) — 키가 없으면
+    # TossQuoteProvider 가 네트워크 호출 없이 즉시 NEEDS_KEY 를 반환해
+    # yfinance 로 곧바로 폴백한다. 이 설계 덕분에 get_registry() 는 키를
+    # 캡처하지 않는 안정적 싱글턴으로 남는다 — registry() 를 소비하는
+    # 8개 lru_cache 서비스(quote/chart/macro/risk/spark/reassurance/
+    # conditions/valuation)를 전부 reset_service_caches() 에서 캐스케이드
+    # 클리어해야 하는 위험을 피한다. 여기에 get_registry.cache_clear() 를
+    # "고치듯" 추가하지 말 것 — 위 이유로 불필요하고, 추가하면 오히려
+    # 절반만 갱신되는 버그를 만든다(하위 8개 서비스는 여전히 캐시됨).
+    kr_chain: list[QuoteProvider] = [
+        TossQuoteProvider(get_toss_client_factory),
+        yf,
+    ]
     # last-good 폴백: 일시 실패 시 마지막 정상값을 STALE 로 제공(메모리 상한).
     return ProviderRegistry(
         {"US": us_chain, "KR": kr_chain}, store=LastGoodStore(max_entries=256)
