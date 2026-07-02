@@ -8,6 +8,7 @@ import { DataStatusBadge } from "./DataStatusBadge";
 import { Panel } from "./Panel";
 import { PortfolioSummaryCard } from "./PortfolioSummaryCard";
 import { PositionCard } from "./PositionCard";
+import { TossCard } from "./TossCard";
 import { TransactionForm } from "./TransactionForm";
 import { TransactionList } from "./TransactionList";
 
@@ -124,6 +125,8 @@ export function PortfolioTab() {
             </table>
           ))}
       </Panel>
+
+      <TossCard />
 
       <Panel title="거래내역">
         <TransactionList transactions={txns.data ?? []} onDeleted={applySummary} />

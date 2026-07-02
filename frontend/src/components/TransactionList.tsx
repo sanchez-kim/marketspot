@@ -21,6 +21,12 @@ function fmtQty(quantity: number): string {
   return quantity.toLocaleString("ko-KR", { maximumFractionDigits: 4 });
 }
 
+function sourceLabel(source: string | undefined): string {
+  if (source === "toss") return "토스";
+  if (source === "toss-baseline") return "기초";
+  return "수동";
+}
+
 /**
  * 거래내역 리스트.
  * 각 행: 날짜(없으면 "기초 보유") · 유형(매수/매도) · 종목 · 수량 · 가격+통화 · × 삭제
@@ -46,6 +52,7 @@ export function TransactionList({ transactions, onDeleted }: Props) {
         <tr>
           <th>날짜</th>
           <th>유형</th>
+          <th>출처</th>
           <th>종목</th>
           <th className="r">수량</th>
           <th className="r">가격</th>
@@ -59,6 +66,7 @@ export function TransactionList({ transactions, onDeleted }: Props) {
             <td className={`txn-type ${t.type === "buy" ? "buy" : "sell"}`}>
               {t.type === "buy" ? "매수" : "매도"}
             </td>
+            <td className="pf-ccy">{sourceLabel(t.source)}</td>
             <td className="pf-sym">{t.symbol}</td>
             <td className="r">{fmtQty(t.quantity)}</td>
             <td className="r">{fmtPrice(t.price, t.currency)}</td>

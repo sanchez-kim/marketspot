@@ -19,6 +19,8 @@ import type {
   SettingsPatch,
   StripItem,
   SymbolMatch,
+  TossStatus,
+  TossSyncResult,
   Transaction,
   ValuationContext,
 } from "./types";
@@ -45,6 +47,16 @@ async function delJSON<T>(url: string): Promise<T> {
   const resp = await fetch(url, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
+  });
+  if (!resp.ok) throw new Error(`요청 실패 (${resp.status}): ${url}`);
+  return (await resp.json()) as T;
+}
+
+async function putJSON<T>(url: string, body: unknown): Promise<T> {
+  const resp = await fetch(url, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
   });
   if (!resp.ok) throw new Error(`요청 실패 (${resp.status}): ${url}`);
   return (await resp.json()) as T;
@@ -165,4 +177,11 @@ export const api = {
     if (!resp.ok) throw new Error(`설정 저장 실패 (${resp.status})`);
     return (await resp.json()) as SafeSettings;
   },
+
+  tossStatus: () => getJSON<DataEnvelope<TossStatus>>(`/api/toss/status`),
+
+  setTossAccount: (accountSeq: string) =>
+    putJSON<DataEnvelope<TossStatus>>(`/api/toss/account`, { accountSeq }),
+
+  tossSync: () => postJSON<DataEnvelope<TossSyncResult>>(`/api/toss/sync`, {}),
 };
