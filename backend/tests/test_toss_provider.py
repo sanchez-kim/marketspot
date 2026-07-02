@@ -88,7 +88,7 @@ def _make_provider(
     def factory() -> TossClient:
         calls.append(1)
         assert client is not None  # 키 없음 케이스에선 절대 호출되면 안 됨
-        return client  # type: ignore[return-value]
+        return client  # type: ignore[return-value]  # 페이크 클라이언트, TossClient 서브타입 아님
 
     def client_factory_provider() -> Callable[[], TossClient]:
         return factory

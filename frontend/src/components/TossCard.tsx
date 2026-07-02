@@ -27,6 +27,11 @@ export function TossCard() {
 
   const sync = useMutation({
     mutationFn: api.tossSync,
+    onError: () => {
+      // 네트워크 단절 등 트랜스포트 실패는 DataEnvelope 없이 예외로 온다 —
+      // 조용히 버튼만 재활성화하지 않고 정직하게 실패를 알린다.
+      setSyncMessage("동기화 요청에 실패했어요. 잠시 후 다시 시도하세요.");
+    },
     onSuccess: (env) => {
       void qc.invalidateQueries({ queryKey: ["toss-status"] });
       void qc.invalidateQueries({ queryKey: ["portfolio"] });

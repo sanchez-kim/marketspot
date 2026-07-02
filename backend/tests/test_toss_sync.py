@@ -112,7 +112,7 @@ def _make_service(
 
     factory: Callable[[], FakeTossClient] = lambda: client  # noqa: E731
     service = TossSyncService(
-        factory,  # type: ignore[arg-type]
+        factory,  # type: ignore[arg-type]  # FakeTossClient은 테스트 전용 대역, TossClient 서브타입 아님
         load_txns=load,
         save_txns=save,
         get_last_sync=get_ls,

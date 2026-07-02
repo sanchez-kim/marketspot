@@ -115,6 +115,15 @@ describe("TossCard", () => {
     await waitFor(() => expect(screen.getByText(/거래 3건 추가/)).toBeInTheDocument());
   });
 
+  it("shows an honest failure message when the sync request itself throws (no envelope)", async () => {
+    vi.spyOn(api, "tossSync").mockRejectedValue(new Error("네트워크 오류"));
+    renderCard(connectedEnvelope());
+    fireEvent.click(screen.getByRole("button", { name: /지금 동기화/ }));
+    await waitFor(() =>
+      expect(screen.getByText(/동기화 요청에 실패했어요/)).toBeInTheDocument(),
+    );
+  });
+
   it("shows drift warnings visibly when the sync result includes them", async () => {
     const result: TossSyncResult = {
       mode: "incremental",
