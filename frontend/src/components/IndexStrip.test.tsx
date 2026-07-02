@@ -66,6 +66,19 @@ describe("IndexStrip STALE quote rendering (§0 honesty)", () => {
     expect(screen.getByText(/데이터 없음/)).toBeInTheDocument();
   });
 
+  it("shows the stale age text alongside price and badge when STALE (§0 honesty)", () => {
+    renderWithStrip([
+      makeStripItem("SPY", "S&P 500", {
+        status: "STALE",
+        source: "yfinance",
+        asOf: "2026-06-30T00:00:00Z",
+        delayMinutes: 15,
+      }),
+    ]);
+    // "N분 전" or "N시간 전" age text is shown
+    expect(screen.getByText(/\d+(분|시간) 전/)).toBeInTheDocument();
+  });
+
   it("does NOT show a colored changePct span when STALE (§0 honesty)", () => {
     const { container } = renderWithStrip([
       makeStripItem("SPY", "S&P 500", { status: "STALE", source: "yfinance" }),

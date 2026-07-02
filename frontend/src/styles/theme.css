@@ -1408,6 +1408,7 @@ body {
 .symbol-detail-head {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
 }
 .symbol-name {
@@ -1936,6 +1937,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 .briefing-title {
   font-weight: 700;

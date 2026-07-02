@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api/client";
-import { changeClass, formatPct, formatPrice } from "../lib/format";
+import { changeClass, formatPct, formatPrice, staleAge } from "../lib/format";
 import { DataStatusBadge } from "./DataStatusBadge";
 
 export function IndexStrip() {
@@ -36,6 +36,9 @@ export function IndexStrip() {
                     status={item.quote.status}
                     source={item.quote.source}
                   />
+                  <span className="muted q-age">
+                    {staleAge(item.quote.asOf, item.quote.delayMinutes)}
+                  </span>
                 </span>
               ) : (
                 <span className={`value ${changeClass(q.changePct)}`}>
