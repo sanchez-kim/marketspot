@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import pytest
 
-from app.models import DataStatus, Quote
+from app.models import Bar, DataStatus, Quote
 from app.providers import yfinance_provider
 from app.providers.yfinance_provider import (
     YFinanceProvider,
@@ -140,3 +140,33 @@ def test_is_rate_limited_detects_429_message() -> None:
     """_is_rate_limited: 429 메시지 감지 + KeyError 는 False."""
     assert _is_rate_limited(Exception("HTTP 429 Too Many Requests")) is True
     assert _is_rate_limited(KeyError("exchangeTimezoneName")) is False
+
+
+# ── get_bars: get_quote 와 동일한 분류 로직을 별도 코드 경로에서도 검증 ──────
+
+
+async def test_bars_rate_limit_exception_maps_to_rate_limited(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """get_bars 도 get_quote 와 동일하게 레이트리밋을 RATE_LIMITED 로 분류한다."""
+
+    class FakeRateLimit(Exception):
+        pass
+
+    def boom(*a: object, **k: object) -> list[Bar]:
+        raise FakeRateLimit("Too Many Requests. Rate limited.")
+
+    monkeypatch.setattr(yfinance_provider, "_fetch_bars", boom)
+    env = await YFinanceProvider().get_bars("AAPL", "1Y", "1D")
+    assert env.status is DataStatus.RATE_LIMITED
+
+
+async def test_bars_timeout_maps_to_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    """get_bars 의 TimeoutError 도 ERROR 로 분류(재시도 없음)."""
+
+    def boom(*a: object, **k: object) -> list[Bar]:
+        raise TimeoutError("응답 시간 초과")
+
+    monkeypatch.setattr(yfinance_provider, "_fetch_bars", boom)
+    env = await YFinanceProvider().get_bars("AAPL", "1Y", "1D")
+    assert env.status is DataStatus.ERROR
