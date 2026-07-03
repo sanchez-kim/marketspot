@@ -346,6 +346,11 @@ class TossClient:
         return TossOrderPage.model_validate(_as_dict(payload))
 
     async def get_order(self, account_seq: int | str, order_id: str) -> TossOrderDetail:
+        # ★ 미확인(공식 문서 대조 2026-07): 개요 문서 산문엔 "orderId로 상세
+        # 조회 가능"이라 적혀 있으나, 실제 OpenAPI 스펙(paths)에는 이 경로가
+        # 안 보인다(문서 자체의 내부 불일치로 보임 — 진짜 404 인지 실키로
+        # 확인 필요). toss_sync.py 는 이 메서드를 쓰지 않는다(주문 목록
+        # 응답의 중첩 execution 필드만으로 처리) — 실사용 영향 없음.
         payload = await self._request(
             "GET", f"/api/v1/orders/{order_id}", account_seq=account_seq
         )

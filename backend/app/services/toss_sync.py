@@ -3,6 +3,15 @@
 기존 Transaction 모델(이동평균 fold → 평단·실현손익)이 **소스 오브 트루스**를
 유지하고, 토스는 *거래를 공급*하는 소스다. 두 가지 흐름:
 
+★ 미확인(실키 검증 필요, 공식 문서 대조 2026-07): 토스는 한국 종목을
+접미사 없는 6자리 코드(``005930``)로 준다(문서로 확정). 이 서비스는 그
+코드를 그대로 ``Transaction.symbol`` 에 저장하는데, 앱의 ``market_of()``
+는 ``.KS``/``.KQ`` 접미사로만 KR 을 판별한다 — 즉 Toss 로 새로 발견되는
+한국 보유종목은 현재 US 로 오라우팅돼 시세·평가액이 안 뜬다(가짜값은
+아님, NO_DATA 로 정직하게 막힘). 어느 거래소(.KS 코스피/.KQ 코스닥)를
+붙일지 판별할 필드가 holdings/orders 응답에 있는지 문서에서 못 찾았다
+— 실키로 실제 응답을 본 뒤 해결할 것(보수적으로 보류, STATUS.md 참고).
+
 부트스트랩(최초 연동)
     ``holdings`` 스냅샷 → 종목별 "기초 보유" Transaction(BUY, date=None,
     price=averagePurchasePrice, source="toss-baseline"). 주문이력 소급 한도가
@@ -120,7 +129,7 @@ class TossSyncService:
         for h in holdings:
             if h.quantity <= 0:
                 continue
-            symbol = h.symbol.upper()
+            symbol = h.symbol.upper()  # ★ 접미사 없음 — 모듈 docstring 미확인 항목
             new.append(
                 Transaction(
                     id=uuid.uuid4().hex,
@@ -259,7 +268,7 @@ def _order_to_txn(order: TossOrder, account_seq: str) -> Transaction:
     ex = order.execution
     assert ex is not None and ex.filled_quantity is not None  # 호출 전 필터로 보장
     assert ex.average_filled_price is not None
-    symbol = order.symbol.upper()
+    symbol = order.symbol.upper()  # ★ 접미사 없음 — 모듈 docstring 미확인 항목
     filled_at = ex.filled_at
     return Transaction(
         id=uuid.uuid4().hex,
