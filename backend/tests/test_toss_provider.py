@@ -19,7 +19,7 @@ from app.models import Bar, DataEnvelope, DataStatus, Quote
 from app.providers.base import QuoteProvider
 from app.providers.registry import ProviderRegistry
 from app.providers.toss_client import TossCandle, TossClient, TossPrice
-from app.providers.toss_provider import TossQuoteProvider
+from app.providers.toss_provider import TossQuoteProvider, _toss_symbol
 
 
 @pytest.fixture(autouse=True)
@@ -62,15 +62,19 @@ class FakeTossClient:
         self.closed = 0
         self.price_calls = 0
         self.candle_calls = 0
+        self.price_symbols: list[list[str]] = []
+        self.candle_symbols: list[str] = []
 
     async def get_prices(self, symbols: list[str]) -> list[TossPrice]:
         self.price_calls += 1
+        self.price_symbols.append(symbols)
         return self._prices
 
     async def get_candles(
         self, symbol: str, interval: str, count: int
     ) -> list[TossCandle]:
         self.candle_calls += 1
+        self.candle_symbols.append(symbol)
         return self._candles
 
     async def aclose(self) -> None:
@@ -101,6 +105,35 @@ def _explode_factory_provider() -> Callable[[], TossClient]:
         raise AssertionError("클라이언트 팩토리가 호출되면 안 됨(네트워크 시도 없음)")
 
     return factory
+
+
+# ── 심볼 정규화(.KS/.KQ 제거, 공식 문서 대조 2026-07) ────────────────────────
+
+
+def test_toss_symbol_strips_ks_and_kq_suffix() -> None:
+    assert _toss_symbol("005930.KS") == "005930"
+    assert _toss_symbol("035720.KQ") == "035720"
+    assert _toss_symbol("005930.ks") == "005930"  # 대소문자 무관
+
+
+def test_toss_symbol_passthrough_when_no_suffix() -> None:
+    assert _toss_symbol("AAPL") == "AAPL"
+
+
+async def test_get_quote_strips_suffix_but_keeps_app_symbol_in_response() -> None:
+    _configure_keys()
+    client = FakeTossClient(
+        prices=[TossPrice(symbol="005930", last_price=72000, currency="KRW")],
+        candles=[_candle(24, 70000), _candle(25, 71000)],
+    )
+    provider = _make_provider(client)
+
+    env = await provider.get_quote("005930.KS")
+
+    assert client.price_symbols == [["005930"]]  # 접미사 없이 토스에 전달
+    assert client.candle_symbols == ["005930"]
+    assert env.data is not None
+    assert env.data.symbol == "005930.KS"  # 응답은 앱 표기 유지(호출자 계약)
 
 
 # ── change/changePct 계산 ────────────────────────────────────────────────────

@@ -56,6 +56,23 @@ def _to_info(acc: TossAccount) -> TossAccountInfo:
     )
 
 
+def _toss_error_message(exc: BaseException) -> str:
+    """토스 표준 에러 바디(``{"error":{"message":...}}``)에서 사람이 읽을
+    메시지를 뽑는다(문서 확인, 2026-07). ``httpx.HTTPStatusError`` 가 아니거나
+    응답이 그 형식이 아니면(연결 오류 등) httpx 의 일반 문자열로 폴백한다
+    (§0 — 정보를 못 뽑아도 조용히 삼키지 않고 뭔가는 보여준다).
+    """
+    if isinstance(exc, httpx.HTTPStatusError):
+        try:
+            body = exc.response.json()
+            msg = body.get("error", {}).get("message")
+            if isinstance(msg, str) and msg:
+                return msg
+        except ValueError:
+            pass
+    return str(exc)
+
+
 def _http_error_envelope(exc: httpx.HTTPError) -> DataEnvelope[TossStatus]:
     """httpx 오류 → 적절한 DataStatus 봉투(429 는 RATE_LIMITED, 그 외 ERROR)."""
     if isinstance(exc, httpx.HTTPStatusError) and exc.response.status_code == 429:
@@ -67,7 +84,7 @@ def _http_error_envelope(exc: httpx.HTTPError) -> DataEnvelope[TossStatus]:
     return DataEnvelope[TossStatus].empty(
         source=_SOURCE,
         status=DataStatus.ERROR,
-        message=f"토스 API 오류: {exc}",
+        message=f"토스 API 오류: {_toss_error_message(exc)}",
     )
 
 
@@ -148,13 +165,13 @@ async def toss_sync(
         return DataEnvelope[TossSyncResult].empty(
             source=_SOURCE,
             status=DataStatus.ERROR,
-            message=f"토스 API 오류: {exc}",
+            message=f"토스 API 오류: {_toss_error_message(exc)}",
         )
     except (httpx.HTTPError, TossSyncError) as exc:
         return DataEnvelope[TossSyncResult].empty(
             source=_SOURCE,
             status=DataStatus.ERROR,
-            message=f"동기화 실패: {exc}",
+            message=f"동기화 실패: {_toss_error_message(exc)}",
         )
 
     try:
@@ -168,7 +185,8 @@ async def toss_sync(
             status=DataStatus.LIVE,
             source=_SOURCE,
             message=(
-                f"동기화는 완료됐지만 잔고 대조(드리프트 확인)는 실패했습니다: {exc}"
+                "동기화는 완료됐지만 잔고 대조(드리프트 확인)는 실패했습니다: "
+                f"{_toss_error_message(exc)}"
             ),
         )
 

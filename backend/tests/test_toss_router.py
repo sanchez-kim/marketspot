@@ -7,6 +7,7 @@
 
 from __future__ import annotations
 
+import json
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -51,6 +52,17 @@ def _rate_limited_error() -> httpx.HTTPStatusError:
     request = httpx.Request("GET", "https://toss.example/accounts")
     response = httpx.Response(429, request=request)
     return httpx.HTTPStatusError("rate limited", request=request, response=response)
+
+
+def _toss_error(
+    status_code: int, body: dict[str, object] | None
+) -> httpx.HTTPStatusError:
+    """토스 표준 에러 바디(``{"error":{"message":...}}``, 공식 문서 확인)를
+    가진 실패 응답. ``body=None`` 이면 비-JSON 본문(파싱 실패 폴백 테스트용)."""
+    request = httpx.Request("GET", "https://toss.example/accounts")
+    content = json.dumps(body).encode() if body is not None else b"not json"
+    response = httpx.Response(status_code, request=request, content=content)
+    return httpx.HTTPStatusError("http error", request=request, response=response)
 
 
 class StubSyncService:
@@ -166,6 +178,55 @@ def test_status_error_on_generic_http_error(monkeypatch: pytest.MonkeyPatch) -> 
     client = TestClient(app)
     resp = client.get("/api/toss/status")
     assert resp.json()["status"] == "ERROR"
+
+
+def test_status_error_uses_toss_error_body_message(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """토스 표준 에러 바디의 message 를 뽑아 쓴다(공식 문서 확인, 2026-07)."""
+    _write_settings(
+        api_keys=ApiKeys(toss_app_key="ak", toss_app_secret="sk"),
+        toss_account_seq="7",
+    )
+    err = _toss_error(
+        500,
+        {
+            "error": {
+                "requestId": "r1",
+                "code": "E500",
+                "message": "토스 서버 오류입니다",
+            }
+        },
+    )
+    fake = FakeStatusClient([], error=err)
+    monkeypatch.setattr(
+        "app.routers.toss.get_toss_client_factory", lambda: lambda: fake
+    )
+    client = TestClient(app)
+    resp = client.get("/api/toss/status")
+    body = resp.json()
+    assert body["status"] == "ERROR"
+    assert "토스 서버 오류입니다" in body["message"]
+
+
+def test_status_error_falls_back_when_body_is_not_json(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """에러 바디가 예상 형식이 아니면 httpx 일반 문자열로 폴백(정보를 삼키지 않음)."""
+    _write_settings(
+        api_keys=ApiKeys(toss_app_key="ak", toss_app_secret="sk"),
+        toss_account_seq="7",
+    )
+    err = _toss_error(500, None)
+    fake = FakeStatusClient([], error=err)
+    monkeypatch.setattr(
+        "app.routers.toss.get_toss_client_factory", lambda: lambda: fake
+    )
+    client = TestClient(app)
+    resp = client.get("/api/toss/status")
+    body = resp.json()
+    assert body["status"] == "ERROR"
+    assert "http error" in body["message"]
 
 
 # ── PUT account ────────────────────────────────────────────────────────────────
