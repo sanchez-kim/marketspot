@@ -26,3 +26,9 @@ backend/static/
 **/.omc/
 .serena/
 docs/superpowers/
+
+# 내부 개발 문서(AI 에이전트 세션 연속성용) — 로컬 전용, 공개 저장소에 포함 안 함
+/STATUS.md
+/DESIGN.md
+/REQUIREMENTS.md
+/CLAUDE.md
