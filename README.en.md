@@ -49,7 +49,9 @@ Sector, market cap, P/E, dividends, and — for ETFs — what's actually inside 
 Enter your holdings, quantities, and average cost, and it calculates live valuation, P&L, and weight for you. If a quote can't be fetched for something, it's honestly left out rather than faked.
 
 **Toss Securities sync**
-Drop in your app key and secret, and it syncs your account, holdings, and transaction history — read-only, no order placement at all. If what the app has computed drifts from your actual Toss balance, it won't quietly paper over the gap; it shows the drift as-is. Also used to backstop Korean-market quotes.
+Drop in your app key and secret, and it syncs your account, holdings, and transaction history — read-only, no order placement at all. If what the app has computed drifts from your actual Toss balance, it won't quietly paper over the gap; it shows the drift as-is. Also used to backstop Korean-market quotes. **This is optional** — everything else works fine on yfinance alone if you skip it.
+
+Get your app key/secret from the Toss Securities app (mobile) or WTS (desktop) → Settings → Open API menu. Enter them in the app itself via the ⚙ settings icon (top right) — not through `.env`.
 
 **AI coach**
 A toggleable sidebar on the right, streaming responses. It reads the situation and opens the conversation, but it never predicts or tells you to buy or sell. If Ollama isn't running, it quietly falls back to rule-based responses.
